@@ -1,1 +1,2 @@
-# Trabalho1_CG
+# CG
+Files for the Computer Graphics course in Three.js

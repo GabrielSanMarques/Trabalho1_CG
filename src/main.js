@@ -8,7 +8,11 @@ import {
   degreesToRadians,
 } from "../libs/util/util.js";
 
+import { 
+  createGround, 
+  moveGround } from "./ground.js";
 import { createPlane } from "./plane.js";
+import { createCamHolder } from "./camHolder.js";
 
 let scene = new THREE.Scene();
 let renderer = initRenderer();
@@ -18,19 +22,16 @@ initDefaultBasicLight(scene);
 
 // Creating the aeroplane
 let plane = createPlane();
-
 scene.add(plane);
 
 // Creating the wired plane
-scene.add(createGroundPlaneWired(100, 100, 50, 50));
+let ground = createGround();
+scene.add(ground);
 
 // Creating the camera holder
-let cameraHolder = new THREE.Object3D();
+let cameraHolder = createCamHolder();
 cameraHolder.add(camera);
 scene.add(cameraHolder);
-
-cameraHolder.position.set(0, 50, 55);
-cameraHolder.rotateX(degreesToRadians(-60));
 
 const showControlsInfoBox = () => {
   let controls = new InfoBox();
@@ -45,6 +46,7 @@ const showControlsInfoBox = () => {
 
 const render = () => {
   renderer.render(scene, camera); // Render scene
+  moveGround(ground);
   requestAnimationFrame(render);
 };
 

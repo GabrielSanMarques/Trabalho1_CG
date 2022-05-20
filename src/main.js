@@ -11,13 +11,14 @@ import { createGround, moveGround } from "./ground.js";
 import { createPlane } from "./plane.js";
 import { createCamHolder, camAngle } from "./camHolder.js";
 import { createShot, moveShot } from "./shot.js";
+import { createEnemy, moveEnemy } from "./enemy.js";
 
 const clock = new THREE.Clock();
 const keyboard = new KeyboardState();
 const scene = new THREE.Scene();
 const renderer = initRenderer();
 const camera = initCamera(new THREE.Vector3(0, 0, 0));
-/* let enemies = []; */
+let enemies = []; 
 let shots = [];
 
 initDefaultBasicLight(scene);
@@ -34,7 +35,12 @@ cameraHolder.add(camera);
 scene.add(cameraHolder);
 
 const generateEnemies = () => {
-  // TODO: bora Marcelo faz as pazes com o git
+  // TODO: gerar inimigos periodicamente
+  //setInterval((() => {
+    let enemyTmp = createEnemy();
+    enemies.push(enemyTmp);
+    scene.add(enemyTmp);
+  //}), THREE.MathUtils.randFloat(1, 5) * 2000);
 };
 
 const checkCollision = () => {
@@ -65,6 +71,7 @@ const keyboardHandler = () => {
   if (keyboard.pressed("down") && plane.position.z <= screenLowerLimitZ)
     plane.translateY(-moveDistance);
   if (keyboard.down("ctrl") || keyboard.down("space")) shot();
+  if (keyboard.down("W")) generateEnemies();
 };
 
 const showControlsInfoBox = () => {
@@ -81,8 +88,10 @@ const showControlsInfoBox = () => {
 const render = () => {
   renderer.render(scene, camera);
   shots.forEach((shot) => moveShot(shot));
+  enemies.forEach((enemy) => moveEnemy(enemy));
+  console.log(enemies);
   checkCollision();
-  generateEnemies();
+  //generateEnemies();
   keyboardHandler();
   moveGround(ground);
   requestAnimationFrame(render);

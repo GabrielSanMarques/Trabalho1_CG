@@ -1,9 +1,8 @@
 import * as THREE from "three";
 
-const clock = new THREE.Clock();
-const ballGeometry = new THREE.SphereGeometry(1, 20, 20);
-const ballMaterial = new THREE.MeshBasicMaterial({ color: 0xf0fff0 });
-const speed = -100;
+const ballGeometry = new THREE.SphereGeometry(0.4, 20, 20);
+const ballMaterial = new THREE.MeshBasicMaterial({ color: "yellow" });
+const speed = -3;
 
 const createShot = (plane) => {
   let x = plane.position.x;
@@ -16,9 +15,7 @@ const createShot = (plane) => {
 };
 
 const moveShot = (shot) => {
-  let moveDistance = speed * clock.getDelta();
-  shot.translateZ(moveDistance);
+  shot.translateZ(speed);
 };
-
 
 export { createShot, moveShot };

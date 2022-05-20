@@ -9,13 +9,14 @@ const createShot = (plane) => {
   let y = plane.position.y;
   let z = plane.position.z - 4;
   let shot = new THREE.Mesh(ballGeometry, ballMaterial);
+  let shotBB = new THREE.Sphere(shot.position, 0.4);
 
   shot.position.set(x, y, z);
-  return shot;
+  return { obj: shot, bb: shotBB };
 };
 
 const moveShot = (shot) => {
-  shot.translateZ(speed);
+  shot.obj.translateZ(speed);
 };
 
 export { createShot, moveShot };

@@ -13,6 +13,8 @@ import { createCamHolder, camAngle } from "./camHolder.js";
 import { createShot, moveShot } from "./shot.js";
 import { createEnemy, moveEnemy } from "./enemy.js";
 
+let generateEnemiesInterval;
+
 const clock = new THREE.Clock();
 const keyboard = new KeyboardState();
 const scene = new THREE.Scene();
@@ -25,6 +27,7 @@ initDefaultBasicLight(scene);
 
 const planeSpeed = 30;
 let plane = createPlane();
+let planeBB = new THREE.Sphere(plane.position, 1);
 scene.add(plane);
 
 let ground = createGround();
@@ -35,12 +38,16 @@ cameraHolder.add(camera);
 scene.add(cameraHolder);
 
 const generateEnemies = () => {
-  // TODO: gerar inimigos periodicamente
-  // setInterval((() => {
   let enemyTmp = createEnemy();
+
   enemies.push(enemyTmp);
   scene.add(enemyTmp.obj);
-  //}), THREE.MathUtils.randFloat(1, 5) * 2000);
+
+  clearInterval(generateEnemiesInterval);
+  generateEnemiesInterval = setInterval(
+    generateEnemies,
+    THREE.MathUtils.randFloat(1, 5) * 300
+  );
 };
 
 const updateEnemies = () => {
@@ -62,11 +69,31 @@ const shot = () => {
   let shotTmp = createShot(plane);
 
   shots.push(shotTmp);
-  scene.add(shotTmp);
+  scene.add(shotTmp.obj);
 };
 
+// FIX: G
 const checkCollision = () => {
-  // TODO: bora Marcelo faz as pazes com o git
+  enemies = enemies.filter((enemy) => {
+    let keep = true;
+
+    if (enemy.bb.intersectsSphere(planeBB)) {
+      scene.remove(plane);
+      console.log("Fim de jogo.");
+    }
+
+    shots = shots.filter((shot) => {
+      if (shot.bb.intersectsSphere(enemy.bb)) {
+        scene.remove(enemy.bb);
+        scene.remove(enemy.obj);
+        scene.remove(shot.obj);
+        scene.remove(shot.bb);
+        keep = false;
+      }
+      return keep;
+    });
+    return keep;
+  });
 };
 
 const screenUpperLimitZ = -5;
@@ -86,7 +113,6 @@ const keyboardHandler = () => {
   if (keyboard.pressed("down") && plane.position.z <= screenLowerLimitZ)
     plane.translateY(-moveDistance);
   if (keyboard.down("ctrl") || keyboard.down("space")) shot();
-  if (keyboard.down("W")) generateEnemies();
 };
 
 const showControlsInfoBox = () => {
@@ -110,6 +136,8 @@ const render = () => {
   moveGround(ground);
   requestAnimationFrame(render);
 };
+
+generateEnemiesInterval = setInterval(generateEnemies, 2000);
 
 showControlsInfoBox();
 render();

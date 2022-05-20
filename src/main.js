@@ -36,15 +36,26 @@ scene.add(cameraHolder);
 
 const generateEnemies = () => {
   // TODO: gerar inimigos periodicamente
-  //setInterval((() => {
+  // setInterval((() => {
   let enemyTmp = createEnemy();
   enemies.push(enemyTmp);
   scene.add(enemyTmp.obj);
   //}), THREE.MathUtils.randFloat(1, 5) * 2000);
 };
 
-const checkCollision = () => {
-  // TODO: bora Marcelo faz as pazes com o git
+const updateEnemies = () => {
+  enemies.forEach((enemy) => {
+    // TODO: verificar se o inimigo não saiu da tela
+    // NOTE: clock.getDelta() estava dando problema para algumas funções de move
+    moveEnemy(enemy);
+  });
+};
+
+const updateShots = () => {
+  shots.forEach((shot) => {
+    // TODO: verificar se o tiro não saiu da tela
+    moveShot(shot);
+  });
 };
 
 const shot = () => {
@@ -52,6 +63,10 @@ const shot = () => {
 
   shots.push(shotTmp);
   scene.add(shotTmp);
+};
+
+const checkCollision = () => {
+  // TODO: bora Marcelo faz as pazes com o git
 };
 
 const screenUpperLimitZ = -5;
@@ -87,8 +102,8 @@ const showControlsInfoBox = () => {
 
 const render = () => {
   renderer.render(scene, camera);
-  shots.forEach((shot) => moveShot(shot));
-  enemies.forEach((enemy) => moveEnemy(enemy));
+  updateShots();
+  updateEnemies();
   checkCollision();
   //generateEnemies();
   keyboardHandler();

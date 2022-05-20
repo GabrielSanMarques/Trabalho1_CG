@@ -18,7 +18,7 @@ const keyboard = new KeyboardState();
 const scene = new THREE.Scene();
 const renderer = initRenderer();
 const camera = initCamera(new THREE.Vector3(0, 0, 0));
-let enemies = []; 
+let enemies = [];
 let shots = [];
 
 initDefaultBasicLight(scene);
@@ -37,9 +37,9 @@ scene.add(cameraHolder);
 const generateEnemies = () => {
   // TODO: gerar inimigos periodicamente
   //setInterval((() => {
-    let enemyTmp = createEnemy();
-    enemies.push(enemyTmp);
-    scene.add(enemyTmp);
+  let enemyTmp = createEnemy();
+  enemies.push(enemyTmp);
+  scene.add(enemyTmp.obj);
   //}), THREE.MathUtils.randFloat(1, 5) * 2000);
 };
 
@@ -89,7 +89,6 @@ const render = () => {
   renderer.render(scene, camera);
   shots.forEach((shot) => moveShot(shot));
   enemies.forEach((enemy) => moveEnemy(enemy));
-  console.log(enemies);
   checkCollision();
   //generateEnemies();
   keyboardHandler();

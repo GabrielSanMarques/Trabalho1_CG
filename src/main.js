@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import KeyboardState from "../libs/util/KeyboardState.js";
 import {
   initRenderer,
   initCamera,
@@ -6,23 +7,22 @@ import {
   InfoBox,
 } from "../libs/util/util.js";
 
-import { 
-  createGround, 
-  moveGround } from "./ground.js";
-import { 
-  createPlane,
-  movePlane,
-  shot } from "./plane.js";
-import { createCamHolder } from "./camHolder.js";
+import { createGround, moveGround } from "./ground.js";
+import { createPlane } from "./plane.js";
+import { createCamHolder, camAngle } from "./camHolder.js";
+import { createShot, moveShot } from "./shot.js";
 
-let scene = new THREE.Scene();
-let renderer = initRenderer();
-let camera = initCamera(new THREE.Vector3(0, 0, 0));
-let enemies = [];
+const clock = new THREE.Clock();
+const keyboard = new KeyboardState();
+const scene = new THREE.Scene();
+const renderer = initRenderer();
+const camera = initCamera(new THREE.Vector3(0, 0, 0));
+/* let enemies = []; */
 let shots = [];
 
 initDefaultBasicLight(scene);
 
+const planeSpeed = 30;
 let plane = createPlane();
 scene.add(plane);
 
@@ -32,6 +32,40 @@ scene.add(ground);
 let cameraHolder = createCamHolder();
 cameraHolder.add(camera);
 scene.add(cameraHolder);
+
+const generateEnemies = () => {
+  // TODO: bora Marcelo faz as pazes com o git
+};
+
+const checkCollision = () => {
+  // TODO: bora Marcelo faz as pazes com o git
+};
+
+const shot = () => {
+  let shotTmp = createShot(plane);
+
+  shots.push(shotTmp);
+  scene.add(shotTmp);
+};
+
+const screenUpperLimitZ = -5;
+const screenLowerLimitZ = 45;
+
+const keyboardHandler = () => {
+  const screenLimitX = 54 + Math.sin(-camAngle) * plane.position.z;
+
+  keyboard.update();
+  var moveDistance = planeSpeed * clock.getDelta();
+  if (keyboard.pressed("right") && plane.position.x <= screenLimitX)
+    plane.translateX(moveDistance);
+  if (keyboard.pressed("left") && plane.position.x >= -screenLimitX)
+    plane.translateX(-moveDistance);
+  if (keyboard.pressed("up") && plane.position.z >= screenUpperLimitZ)
+    plane.translateY(moveDistance);
+  if (keyboard.pressed("down") && plane.position.z <= screenLowerLimitZ)
+    plane.translateY(-moveDistance);
+  if (keyboard.down("ctrl") || keyboard.down("space")) shot();
+};
 
 const showControlsInfoBox = () => {
   let controls = new InfoBox();
@@ -45,9 +79,11 @@ const showControlsInfoBox = () => {
 };
 
 const render = () => {
-  renderer.render(scene, camera); 
-  movePlane(plane);
-  shot(plane, shots);
+  renderer.render(scene, camera);
+  shots.forEach((shot) => moveShot(shot));
+  checkCollision();
+  generateEnemies();
+  keyboardHandler();
   moveGround(ground);
   requestAnimationFrame(render);
 };

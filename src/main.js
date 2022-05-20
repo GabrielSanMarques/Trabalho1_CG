@@ -4,31 +4,31 @@ import {
   initCamera,
   initDefaultBasicLight,
   InfoBox,
-  createGroundPlaneWired,
-  degreesToRadians,
 } from "../libs/util/util.js";
 
 import { 
   createGround, 
   moveGround } from "./ground.js";
-import { createPlane } from "./plane.js";
+import { 
+  createPlane,
+  movePlane,
+  shot } from "./plane.js";
 import { createCamHolder } from "./camHolder.js";
 
 let scene = new THREE.Scene();
 let renderer = initRenderer();
 let camera = initCamera(new THREE.Vector3(0, 0, 0));
+let enemies = [];
+let shots = [];
 
 initDefaultBasicLight(scene);
 
-// Creating the aeroplane
 let plane = createPlane();
 scene.add(plane);
 
-// Creating the wired plane
 let ground = createGround();
 scene.add(ground);
 
-// Creating the camera holder
 let cameraHolder = createCamHolder();
 cameraHolder.add(camera);
 scene.add(cameraHolder);
@@ -45,7 +45,9 @@ const showControlsInfoBox = () => {
 };
 
 const render = () => {
-  renderer.render(scene, camera); // Render scene
+  renderer.render(scene, camera); 
+  movePlane(plane);
+  shot(plane, shots);
   moveGround(ground);
   requestAnimationFrame(render);
 };

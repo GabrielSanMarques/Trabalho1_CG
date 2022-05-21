@@ -52,16 +52,27 @@ const generateEnemies = () => {
 
 const updateEnemies = () => {
   enemies.forEach((enemy) => {
-    // TODO: verificar se o inimigo não saiu da tela
-    // NOTE: clock.getDelta() estava dando problema para algumas funções de move
     moveEnemy(enemy);
+    if (enemy.obj.position.z >= 60)
+    {
+      scene.remove(enemy.obj);
+      scene.remove(enemy.bb);
+      enemies.splice(enemies.indexOf(enemy), 1);
+      console.log(enemies);
+    }
   });
 };
 
 const updateShots = () => {
   shots.forEach((shot) => {
-    // TODO: verificar se o tiro não saiu da tela
     moveShot(shot);
+    if (shot.obj.position.z <= -10)
+    {
+      scene.remove(shot.obj);
+      scene.remove(shot.bb);
+      shots.splice(shots.indexOf(shot), 1);
+      console.log(shots);
+    }
   });
 };
 
@@ -88,6 +99,10 @@ const checkCollision = () => {
         scene.remove(enemy.obj);
         scene.remove(shot.obj);
         scene.remove(shot.bb);
+        shots.splice(shots.indexOf(shot), 1);
+        enemies.splice(enemies.indexOf(enemy), 1);
+        console.log(shots);
+        console.log(enemies);
         keep = false;
       }
       return keep;

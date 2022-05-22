@@ -4,7 +4,7 @@ import { degreesToRadians } from "../libs/util/util.js";
 const camX = 0;
 const camY = 50;
 const camZ = 55;
-const camAngle = -60;
+const camAngle = -50;
 
 const createCamHolder = () => {
   let camHolder = new THREE.Object3D();

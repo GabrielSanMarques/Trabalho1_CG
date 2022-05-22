@@ -25,7 +25,7 @@ let shots = [];
 
 initDefaultBasicLight(scene);
 
-const planeSpeed = 30;
+const planeSpeed = 40;
 let plane = createPlane();
 let planeBB = new THREE.Sphere(plane.position, 1);
 scene.add(plane);
@@ -51,29 +51,35 @@ const generateEnemies = () => {
 };
 
 const updateEnemies = () => {
-  enemies.forEach((enemy) => {
+  enemies = enemies.filter((enemy) => {
+    let keepEnemy = true;
+
     moveEnemy(enemy);
     if (enemy.obj.position.z >= 60)
     {
       scene.remove(enemy.obj);
       scene.remove(enemy.bb);
-      enemies.splice(enemies.indexOf(enemy), 1);
-      console.log(enemies);
+      keepEnemy = false;
     }
+    return keepEnemy;
   });
+  console.log(enemies);
 };
 
 const updateShots = () => {
-  shots.forEach((shot) => {
-    moveShot(shot);
-    if (shot.obj.position.z <= -10)
-    {
-      scene.remove(shot.obj);
-      scene.remove(shot.bb);
-      shots.splice(shots.indexOf(shot), 1);
-      console.log(shots);
-    }
+  shots = shots.filter((shot) => {
+      let keepShot = true;
+
+      moveShot(shot);
+      if (shot.obj.position.z <= -45)
+      {
+        scene.remove(shot.obj);
+        scene.remove(shot.bb);
+        keepShot = false;
+      }
+      return keepShot;
   });
+  console.log(shots);
 };
 
 const shot = () => {
@@ -91,6 +97,7 @@ const checkCollision = () => {
     if (enemy.bb.intersectsSphere(planeBB)) {
       scene.remove(plane);
       console.log("Fim de jogo.");
+      window.location.reload();
     }
 
     shots = shots.filter((shot) => {
@@ -99,8 +106,6 @@ const checkCollision = () => {
         scene.remove(enemy.obj);
         scene.remove(shot.obj);
         scene.remove(shot.bb);
-        shots.splice(shots.indexOf(shot), 1);
-        enemies.splice(enemies.indexOf(enemy), 1);
         console.log(shots);
         console.log(enemies);
         keep = false;
@@ -111,17 +116,16 @@ const checkCollision = () => {
   });
 };
 
-const screenUpperLimitZ = -5;
-const screenLowerLimitZ = 45;
+const screenUpperLimitZ = -35;
+const screenLowerLimitZ = 35;
 
 const keyboardHandler = () => {
-  const screenLimitX = 54 + Math.sin(-camAngle) * plane.position.z;
 
   keyboard.update();
   var moveDistance = planeSpeed * clock.getDelta();
-  if (keyboard.pressed("right") && plane.position.x <= screenLimitX)
+  if (keyboard.pressed("right"))
     plane.translateX(moveDistance);
-  if (keyboard.pressed("left") && plane.position.x >= -screenLimitX)
+  if (keyboard.pressed("left"))
     plane.translateX(-moveDistance);
   if (keyboard.pressed("up") && plane.position.z >= screenUpperLimitZ)
     plane.translateY(moveDistance);

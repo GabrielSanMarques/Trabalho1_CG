@@ -2,13 +2,13 @@ import * as THREE from "three";
 
 const enemyGeometry = new THREE.BoxGeometry(3, 3, 3);
 const enemyMaterial = new THREE.MeshLambertMaterial({ color: "green" });
-const screenLimit = 60;
+const screenLimit = 70;
 
 const createEnemy = () => {
   var enemy = new THREE.Mesh(enemyGeometry, enemyMaterial);
   var enemyX = THREE.MathUtils.randFloat(-screenLimit, screenLimit);
 
-  enemy.position.set(enemyX, 1.5, -10);
+  enemy.position.set(enemyX, 1.5, -45);
 
   let enemyBB = new THREE.Sphere(enemy.position, 1.7);
 

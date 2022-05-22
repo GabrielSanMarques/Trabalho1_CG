@@ -1,7 +1,7 @@
 import * as THREE from "three";
 
 const ballGeometry = new THREE.SphereGeometry(0.4, 20, 20);
-const ballMaterial = new THREE.MeshBasicMaterial({ color: "yellow" });
+const ballMaterial = new THREE.MeshLambertMaterial({ color: "yellow" });
 const speed = -3;
 
 const createShot = (plane) => {

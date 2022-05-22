@@ -55,8 +55,7 @@ const updateEnemies = () => {
     let keepEnemy = true;
 
     moveEnemy(enemy);
-    if (enemy.obj.position.z >= 60)
-    {
+    if (enemy.obj.position.z >= 60) {
       scene.remove(enemy.obj);
       scene.remove(enemy.bb);
       keepEnemy = false;
@@ -68,16 +67,15 @@ const updateEnemies = () => {
 
 const updateShots = () => {
   shots = shots.filter((shot) => {
-      let keepShot = true;
+    let keepShot = true;
 
-      moveShot(shot);
-      if (shot.obj.position.z <= -45)
-      {
-        scene.remove(shot.obj);
-        scene.remove(shot.bb);
-        keepShot = false;
-      }
-      return keepShot;
+    moveShot(shot);
+    if (shot.obj.position.z <= -45) {
+      scene.remove(shot.obj);
+      scene.remove(shot.bb);
+      keepShot = false;
+    }
+    return keepShot;
   });
   console.log(shots);
 };
@@ -89,15 +87,35 @@ const shot = () => {
   scene.add(shotTmp.obj);
 };
 
+function fadeOutEffect(objet) {
+  var fadeEffect = setInterval(function () {
+    if (!objet.material.opacity) {
+      objet.material.opacity = 1;
+    }
+    if (objet.material.opacity > 0) {
+      objet.material.opacity -= 0.1;
+    } else {
+      clearInterval(fadeEffect);
+      window.location.reload();
+    }
+    if (objet.material.opacity == 0) {
+      scene.remove(plane);
+    }
+  }, 1000);
+}
+
+function reiniciando() {
+  window.location.reload();
+}
 // FIX: G
 const checkCollision = () => {
   enemies = enemies.filter((enemy) => {
     let keep = true;
 
     if (enemy.bb.intersectsSphere(planeBB)) {
-      scene.remove(plane);
+      fadeOutEffect(plane);
       console.log("Fim de jogo.");
-      window.location.reload();
+      const reinicia = setTimeout(reiniciando, 6000);
     }
 
     shots = shots.filter((shot) => {
@@ -120,13 +138,10 @@ const screenUpperLimitZ = -35;
 const screenLowerLimitZ = 35;
 
 const keyboardHandler = () => {
-
   keyboard.update();
   var moveDistance = planeSpeed * clock.getDelta();
-  if (keyboard.pressed("right"))
-    plane.translateX(moveDistance);
-  if (keyboard.pressed("left"))
-    plane.translateX(-moveDistance);
+  if (keyboard.pressed("right")) plane.translateX(moveDistance);
+  if (keyboard.pressed("left")) plane.translateX(-moveDistance);
   if (keyboard.pressed("up") && plane.position.z >= screenUpperLimitZ)
     plane.translateY(moveDistance);
   if (keyboard.pressed("down") && plane.position.z <= screenLowerLimitZ)

@@ -11,7 +11,7 @@ const createPlane = () => {
   let plane = new THREE.Mesh(planeGeometry, planeMaterial);
   plane.rotateX(degreesToRadians(-90));
   plane.position.set(planeX, planeY, planeZ);
-
+  plane.material.transparent = true;
   return plane;
 };
 

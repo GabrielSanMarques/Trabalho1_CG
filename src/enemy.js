@@ -1,10 +1,10 @@
 import * as THREE from "three";
 
-const enemyGeometry = new THREE.BoxGeometry(3, 3, 3);
-const enemyMaterial = new THREE.MeshLambertMaterial({ color: "green" });
 const screenLimit = 70;
+const enemyGeometry = new THREE.BoxGeometry(3, 3, 3);
 
 const createEnemy = () => {
+  const enemyMaterial = new THREE.MeshLambertMaterial({ color: "green" });
   var enemy = new THREE.Mesh(enemyGeometry, enemyMaterial);
   var enemyX = THREE.MathUtils.randFloat(-screenLimit, screenLimit);
   enemy.material.transparent = true;

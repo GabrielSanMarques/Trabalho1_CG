@@ -88,26 +88,25 @@ const shot = () => {
 };
 
 function fadeOutEffect(objet) {
-  var fadeEffect = setInterval(function () {
+  var fadeEffect = setInterval(() => {
     if (!objet.material.opacity) {
       objet.material.opacity = 1;
     }
     if (objet.material.opacity > 0) {
-      objet.material.opacity -= 0.1;
+      objet.material.opacity -= 0.2;
     } else {
       clearInterval(fadeEffect);
-      window.location.reload();
     }
     if (objet.material.opacity == 0) {
-      scene.remove(plane);
+      scene.remove(objet);
     }
-  }, 1000);
+  }, 100);
 }
 
 function reiniciando() {
   window.location.reload();
 }
-// FIX: G
+
 const checkCollision = () => {
   enemies = enemies.filter((enemy) => {
     let keep = true;
@@ -115,13 +114,13 @@ const checkCollision = () => {
     if (enemy.bb.intersectsSphere(planeBB)) {
       fadeOutEffect(plane);
       console.log("Fim de jogo.");
-      const reinicia = setTimeout(reiniciando, 6000);
+      setTimeout(reiniciando, 1000);
     }
 
     shots = shots.filter((shot) => {
       if (shot.bb.intersectsSphere(enemy.bb)) {
         scene.remove(enemy.bb);
-        scene.remove(enemy.obj);
+        fadeOutEffect(enemy.obj);
         scene.remove(shot.obj);
         scene.remove(shot.bb);
         console.log(shots);

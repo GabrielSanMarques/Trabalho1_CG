@@ -8,10 +8,10 @@ import {
 } from "../libs/util/util.js";
 
 import { createGround, moveGround } from "./ground.js";
-import { createPlane } from "./plane.js";
-import { createCamHolder, camAngle } from "./camHolder.js";
-import { createShot, moveShot } from "./shot.js";
-import { createEnemy, moveEnemy } from "./enemy.js";
+import { AirPlane } from "./AirPlane.js";
+import { createCameraHolder } from "./cameraHolder.js";
+import { Shot } from "./Shot.js";
+import { Enemy } from "./Enemy.js";
 
 let generateEnemiesInterval;
 
@@ -26,22 +26,15 @@ let shots = [];
 initDefaultBasicLight(scene);
 
 const planeSpeed = 40;
-let plane = createPlane();
-let planeBB = new THREE.Sphere(plane.position, 1);
-scene.add(plane);
+const plane = new AirPlane(scene);
 
-let ground = createGround();
+const ground = createGround();
 scene.add(ground);
 
-let cameraHolder = createCamHolder();
-cameraHolder.add(camera);
-scene.add(cameraHolder);
+createCameraHolder(camera, scene);
 
 const generateEnemies = () => {
-  let enemyTmp = createEnemy();
-
-  enemies.push(enemyTmp);
-  scene.add(enemyTmp.obj);
+  enemies.push(new Enemy(scene));
 
   clearInterval(generateEnemiesInterval);
   generateEnemiesInterval = setInterval(
@@ -54,54 +47,29 @@ const updateEnemies = () => {
   enemies = enemies.filter((enemy) => {
     let keepEnemy = true;
 
-    moveEnemy(enemy);
-    if (enemy.obj.position.z >= 60) {
-      scene.remove(enemy.obj);
-      scene.remove(enemy.bb);
+    enemy.move();
+    if (enemy.positionZ() >= 60) {
+      enemy.removeFromScene();
       keepEnemy = false;
     }
     return keepEnemy;
   });
-  console.log(enemies);
 };
 
 const updateShots = () => {
   shots = shots.filter((shot) => {
     let keepShot = true;
 
-    moveShot(shot);
-    if (shot.obj.position.z <= -45) {
-      scene.remove(shot.obj);
-      scene.remove(shot.bb);
+    shot.move();
+    if (shot.positionZ() <= -45) {
+      shot.removeFromScene();
       keepShot = false;
     }
     return keepShot;
   });
-  console.log(shots);
 };
 
-const shot = () => {
-  let shotTmp = createShot(plane);
-
-  shots.push(shotTmp);
-  scene.add(shotTmp.obj);
-};
-
-function fadeOutEffect(objet) {
-  var fadeEffect = setInterval(() => {
-    if (!objet.material.opacity) {
-      objet.material.opacity = 1;
-    }
-    if (objet.material.opacity > 0) {
-      objet.material.opacity -= 0.2;
-    } else {
-      clearInterval(fadeEffect);
-    }
-    if (objet.material.opacity == 0) {
-      scene.remove(objet);
-    }
-  }, 100);
-}
+const shot = () => shots.push(new Shot(plane, scene));
 
 function reiniciando() {
   window.location.reload();
@@ -111,20 +79,16 @@ const checkCollision = () => {
   enemies = enemies.filter((enemy) => {
     let keep = true;
 
-    if (enemy.bb.intersectsSphere(planeBB)) {
-      fadeOutEffect(plane);
+    if (enemy.collidesWith(plane)) {
+      plane.fadoutFromScene();
       console.log("Fim de jogo.");
       setTimeout(reiniciando, 1000);
     }
 
     shots = shots.filter((shot) => {
-      if (shot.bb.intersectsSphere(enemy.bb)) {
-        scene.remove(enemy.bb);
-        fadeOutEffect(enemy.obj);
-        scene.remove(shot.obj);
-        scene.remove(shot.bb);
-        console.log(shots);
-        console.log(enemies);
+      if (shot.collidesWith(enemy)) {
+        enemy.fadoutFromScene();
+        shot.removeFromScene();
         keep = false;
       }
       return keep;
@@ -141,9 +105,9 @@ const keyboardHandler = () => {
   var moveDistance = planeSpeed * clock.getDelta();
   if (keyboard.pressed("right")) plane.translateX(moveDistance);
   if (keyboard.pressed("left")) plane.translateX(-moveDistance);
-  if (keyboard.pressed("up") && plane.position.z >= screenUpperLimitZ)
+  if (keyboard.pressed("up") && plane.positionZ() >= screenUpperLimitZ)
     plane.translateY(moveDistance);
-  if (keyboard.pressed("down") && plane.position.z <= screenLowerLimitZ)
+  if (keyboard.pressed("down") && plane.positionZ() <= screenLowerLimitZ)
     plane.translateY(-moveDistance);
   if (keyboard.down("ctrl") || keyboard.down("space")) shot();
 };

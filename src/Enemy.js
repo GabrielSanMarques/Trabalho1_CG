@@ -9,7 +9,7 @@ export class Enemy extends FadoutObject {
     super(
       new THREE.Mesh(
         enemyGeometry,
-        new THREE.MeshLambertMaterial({ color: "green" })
+        new THREE.MeshPhongMaterial({ color: "green" })
       ),
       null,
       scene
@@ -20,6 +20,7 @@ export class Enemy extends FadoutObject {
     this.bb = new THREE.Sphere(this.obj.position, 1.7);
     this.speed = THREE.MathUtils.randFloat(0.5, 1);
     this.obj.position.set(enemyX, 1.5, -45);
+    this.obj.castShadow = true;
   }
 
   move() {

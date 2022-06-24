@@ -12,7 +12,7 @@ export class AirPlane extends FadoutObject {
     super(
       new THREE.Mesh(
         planeGeometry,
-        new THREE.MeshLambertMaterial({ color: "red" })
+        new THREE.MeshPhongMaterial({ color: "red" })
       ),
       null,
       scene
@@ -21,9 +21,14 @@ export class AirPlane extends FadoutObject {
     this.bb = new THREE.Sphere(this.obj.position, 1);
     this.obj.rotateX(degreesToRadians(-90));
     this.obj.position.set(planeX, planeY, planeZ);
-
+    this.obj.castShadow = true;
     if (scene) {
       this.addToScene(scene);
     }
+  }
+
+  disableCollision() {
+    this.bb.makeEmpty();
+    this.obj.position.set(planeX, planeY, planeZ);
   }
 }

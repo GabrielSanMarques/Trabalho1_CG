@@ -26,6 +26,7 @@ export class FadoutObject extends GameObject {
     if (this.scene) {
       this.scene.remove(this.bb);
       fadeOutEffect(this.obj, this.scene);
+      this.obj.castShadow = false;
       this.scene = null;
     }
   }

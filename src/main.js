@@ -12,23 +12,39 @@ import { AirPlane } from "./AirPlane.js";
 import { createCameraHolder } from "./cameraHolder.js";
 import { Shot } from "./Shot.js";
 import { Enemy } from "./Enemy.js";
+import { createDirectionalLight } from "./DirLight.js";
+
+import Stats from "../build/jsm/libs/stats.module.js"; //
+var stats = new Stats(); // To show FPS information //
+stats.showPanel(0); //
+document.body.appendChild(stats.dom); //
 
 let generateEnemiesInterval;
 
 const clock = new THREE.Clock();
 const keyboard = new KeyboardState();
 const scene = new THREE.Scene();
-const renderer = initRenderer();
+//const renderer = initRenderer(); ANTIGO RENDER
+let renderer = new THREE.WebGL1Renderer(); // Novo Render
+document.getElementById("webgl-output").appendChild(renderer.domElement); //
+renderer.setSize(window.innerWidth, window.innerHeight); //
+renderer.shadowMap.enabled = true; //
+renderer.shadowMap.type = THREE.VSMShadowMap; // default
+renderer.shadowMap.needsUpdate = true;
+//renderer.setPixelRatio(window.devicePixelRatio * 0.5); //Diminuir qualidade para aumentar FPS
+
 const camera = initCamera(new THREE.Vector3(0, 0, 0));
 let enemies = [];
 let shots = [];
 
-initDefaultBasicLight(scene);
+//initDefaultBasicLight(scene);//Antiga Luz
+createDirectionalLight(scene); //Luz Direcional
 
 const planeSpeed = 40;
 const plane = new AirPlane(scene);
 
 const ground = createGround();
+ground.receiveShadow = true; //Receber sombras
 scene.add(ground);
 
 createCameraHolder(camera, scene);
@@ -109,7 +125,10 @@ const keyboardHandler = () => {
     plane.translateY(moveDistance);
   if (keyboard.pressed("down") && plane.positionZ() <= screenLowerLimitZ)
     plane.translateY(-moveDistance);
-  if (keyboard.down("ctrl") || keyboard.down("space")) shot();
+  if (keyboard.down("ctrl")) shot(); // Missil Aereo
+  if (keyboard.down("space")) shot(); //Misseis ar-terra
+  if (keyboard.pressed("G")) plane.disableCollision(); // Evitar Colisão
+  if (keyboard.pressed("enter")) reiniciando(); //Retornar ao Inicio
 };
 
 const showControlsInfoBox = () => {
@@ -132,6 +151,7 @@ const render = () => {
   keyboardHandler();
   moveGround(ground);
   requestAnimationFrame(render);
+  stats.update(); // Update FPS
 };
 
 generateEnemiesInterval = setInterval(generateEnemies, 2000);

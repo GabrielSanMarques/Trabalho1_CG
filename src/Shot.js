@@ -15,7 +15,6 @@ export class Shot extends GameObject {
 
     this.bb = new THREE.Sphere(this.obj.position, 0.4);
     this.obj.position.set(x, y, z);
-    this.obj.castShadow = true;
   }
 
   move() {

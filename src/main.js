@@ -12,9 +12,13 @@ import { AirPlane } from "./AirPlane.js";
 import { createCameraHolder } from "./cameraHolder.js";
 import { Shot } from "./Shot.js";
 import { Enemy } from "./Enemy.js";
+import { SideEnemy } from "./SideEnemy.js";
+import { ArcEnemy } from "./ArcEnemy.js";
 import { createDirectionalLight } from "./DirLight.js";
 
 import Stats from "../build/jsm/libs/stats.module.js"; //
+import { AirEnemyShot } from "./AirEnemyShot.js";
+import { PlaneBufferGeometry } from "three";
 var stats = new Stats(); // To show FPS information //
 stats.showPanel(0); //
 document.body.appendChild(stats.dom); //
@@ -36,6 +40,7 @@ renderer.shadowMap.needsUpdate = true;
 const camera = initCamera(new THREE.Vector3(0, 0, 0));
 let enemies = [];
 let shots = [];
+let enemyShots = [];
 
 //initDefaultBasicLight(scene);//Antiga Luz
 createDirectionalLight(scene); //Luz Direcional
@@ -47,10 +52,48 @@ const ground = createGround();
 ground.receiveShadow = true; //Receber sombras
 scene.add(ground);
 
+var sideDirection;
+
 createCameraHolder(camera, scene);
 
+var game = () => {
+
+  //Wave 1
+  setTimeout(
+    () => {
+      for(var i = 0; i < 5; i++)
+        enemies.push(new Enemy(scene, -30 + 15*i, 0.4, plane));
+    }, 1000
+  );
+
+  //Wave 2
+  sideDirection = 1;
+  setTimeout(
+    () => {
+      for(var i = 0; i < 6; i++)
+      {
+        enemies.push(new SideEnemy(scene, -25 + 10*i, 0.7, sideDirection));
+        sideDirection *= -1;
+      }
+    }, 5000
+  );
+
+  //Wave 3
+  sideDirection = 1;
+  setTimeout(
+    () => {
+      for(var i = 0; i < 6; i++)
+      {
+        enemies.push(new ArcEnemy(scene, 10 + 8*i, 0.5, sideDirection));
+        sideDirection *= -1;
+      }
+    }, 10000
+  );
+}
+
+/*
 const generateEnemies = () => {
-  enemies.push(new Enemy(scene));
+  enemies.push(new ArcEnemy(scene));
 
   clearInterval(generateEnemiesInterval);
   generateEnemiesInterval = setInterval(
@@ -58,19 +101,43 @@ const generateEnemies = () => {
     THREE.MathUtils.randFloat(1, 5) * 300
   );
 };
+*/
 
 const updateEnemies = () => {
   enemies = enemies.filter((enemy) => {
     let keepEnemy = true;
 
     enemy.move();
-    if (enemy.positionZ() >= 60) {
+    if ( enemy instanceof Enemy && enemy.positionZ() >= 60 
+      || enemy instanceof SideEnemy && (enemy.positionX() >= 90 || enemy.positionX() <= -90)
+      || enemy instanceof ArcEnemy && enemy.destroy()) {
       enemy.removeFromScene();
       keepEnemy = false;
     }
     return keepEnemy;
   });
 };
+
+
+const enemyShot = () => {
+  enemies.forEach((enemy) => {
+    enemyShots.push(new AirEnemyShot(enemy, scene, plane));
+  })
+}
+
+const updateEnemyShots = () => {
+  enemyShots = enemyShots.filter((shot) => {
+    let keepShot = true;
+
+    shot.move();
+    if(shot.positionX() > 70 || shot.positionX() < -70 || shot.positionZ() < -45 || shot.positionZ() > 45) {
+      shot.removeFromScene();
+      keepShot = false;
+    }
+    return keepShot;
+  });
+};
+
 
 const updateShots = () => {
   shots = shots.filter((shot) => {
@@ -111,6 +178,18 @@ const checkCollision = () => {
     });
     return keep;
   });
+
+  enemyShots = enemyShots.filter((shot) => {
+    let keep = true;
+    if (shot.collidesWith(plane)) {
+      shot.removeFromScene();
+      plane.fadoutFromScene();
+      console.log("Fim de jogo.");
+      setTimeout(reiniciando, 1000);
+      keep = false;
+    }
+    return keep;
+  });
 };
 
 const screenUpperLimitZ = -35;
@@ -145,6 +224,7 @@ const showControlsInfoBox = () => {
 const render = () => {
   renderer.render(scene, camera);
   updateShots();
+  updateEnemyShots();
   updateEnemies();
   checkCollision();
   //generateEnemies();
@@ -154,7 +234,9 @@ const render = () => {
   stats.update(); // Update FPS
 };
 
-generateEnemiesInterval = setInterval(generateEnemies, 2000);
+game();
+setInterval(enemyShot, 3000);
+//generateEnemiesInterval = setInterval(generateEnemies, 2000);
 
 showControlsInfoBox();
 render();

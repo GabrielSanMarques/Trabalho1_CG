@@ -21,7 +21,6 @@ export class AirPlane extends FadoutObject {
     this.bb = new THREE.Sphere(this.obj.position, 1);
     this.obj.rotateX(degreesToRadians(-90));
     this.obj.position.set(planeX, planeY, planeZ);
-    this.obj.castShadow = true;
     if (scene) {
       this.addToScene(scene);
     }

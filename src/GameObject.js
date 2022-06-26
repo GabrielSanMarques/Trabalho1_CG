@@ -3,6 +3,7 @@ export class GameObject {
     this.obj = obj;
     this.bb = boundingBox;
     this.scene = null;
+    this.obj.castShadow = true;
 
     if (scene) {
       this.addToScene(scene);

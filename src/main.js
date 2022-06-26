@@ -6,7 +6,9 @@ import { Shot } from "./Shot.js";
 import { Enemy } from "./Enemy.js";
 import { SideEnemy } from "./SideEnemy.js";
 import { ArcEnemy } from "./ArcEnemy.js";
+import { GroundEnemy } from "./GroundEnemy.js";
 import { AirEnemyShot } from "./AirEnemyShot.js";
+import { GroundEnemyShot } from "./GroundEnemyShot.js";
 
 import { createFpsStatsPanel } from "./stats.js";
 import { createRenderer } from "./renderer.js";
@@ -63,6 +65,14 @@ var game = () => {
       sideDirection *= -1;
     }
   }, 10000);
+
+  //Wave 4
+  setTimeout(
+    () => {
+      for(var i = 0; i < 6; i++)
+        enemies.push(new GroundEnemy(scene, -40 + 16 * i, -60, plane));
+    }, 12000
+  ); 
 };
 
 /*
@@ -100,7 +110,10 @@ const updateEnemies = () => {
 
 const enemyShot = () => {
   enemies.forEach((enemy) => {
-    enemyShots.push(new AirEnemyShot(enemy, scene, plane));
+    if(enemy instanceof GroundEnemy)
+      enemyShots.push(new GroundEnemyShot(enemy, scene, plane));
+    else
+      enemyShots.push(new AirEnemyShot(enemy, scene, plane));
   });
 };
 

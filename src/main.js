@@ -4,6 +4,9 @@ import KeyboardState from "../libs/util/KeyboardState.js";
 import { AirPlane } from "./AirPlane.js";
 import { Shot } from "./Shot.js";
 import { Enemy } from "./Enemy.js";
+import { SideEnemy } from "./SideEnemy.js";
+import { ArcEnemy } from "./ArcEnemy.js";
+import { AirEnemyShot } from "./AirEnemyShot.js";
 
 import { createFpsStatsPanel } from "./stats.js";
 import { createRenderer } from "./renderer.js";
@@ -31,11 +34,43 @@ createCameraHolder(camera, scene);
 
 let enemies = [];
 let shots = [];
+let enemyShots = [];
 
+var sideDirection;
+
+createCameraHolder(camera, scene);
+
+var game = () => {
+  //Wave 1
+  setTimeout(() => {
+    for (var i = 0; i < 5; i++)
+      enemies.push(new Enemy(scene, -30 + 15 * i, 0.4, plane));
+  }, 1000);
+
+  //Wave 2
+  sideDirection = 1;
+  setTimeout(() => {
+    for (var i = 0; i < 6; i++) {
+      enemies.push(new SideEnemy(scene, -25 + 10 * i, 0.7, sideDirection));
+      sideDirection *= -1;
+    }
+  }, 5000);
+
+  //Wave 3
+  sideDirection = 1;
+  setTimeout(() => {
+    for (var i = 0; i < 6; i++) {
+      enemies.push(new ArcEnemy(scene, 10 + 8 * i, 0.5, sideDirection));
+      sideDirection *= -1;
+    }
+  }, 10000);
+};
+
+/*
 let generateEnemiesInterval;
 
 const generateEnemies = () => {
-  enemies.push(new Enemy(scene));
+  enemies.push(new ArcEnemy(scene));
 
   clearInterval(generateEnemiesInterval);
 
@@ -44,17 +79,47 @@ const generateEnemies = () => {
     THREE.MathUtils.randFloat(1, 5) * 300
   );
 };
+*/
 
 const updateEnemies = () => {
   enemies = enemies.filter((enemy) => {
     let keepEnemy = true;
 
     enemy.move();
-    if (enemy.positionZ() >= 60) {
+    if (
+      (enemy instanceof Enemy && enemy.positionZ() >= 60) ||
+      (enemy instanceof SideEnemy &&
+        (enemy.positionX() >= 90 || enemy.positionX() <= -90)) ||
+      (enemy instanceof ArcEnemy && enemy.destroy())
+    ) {
       enemy.removeFromScene();
       keepEnemy = false;
     }
     return keepEnemy;
+  });
+};
+
+const enemyShot = () => {
+  enemies.forEach((enemy) => {
+    enemyShots.push(new AirEnemyShot(enemy, scene, plane));
+  });
+};
+
+const updateEnemyShots = () => {
+  enemyShots = enemyShots.filter((shot) => {
+    let keepShot = true;
+
+    shot.move();
+    if (
+      shot.positionX() > 70 ||
+      shot.positionX() < -70 ||
+      shot.positionZ() < -45 ||
+      shot.positionZ() > 45
+    ) {
+      shot.removeFromScene();
+      keepShot = false;
+    }
+    return keepShot;
   });
 };
 
@@ -92,6 +157,18 @@ const checkCollision = () => {
       }
       return keep;
     });
+    return keep;
+  });
+
+  enemyShots = enemyShots.filter((shot) => {
+    let keep = true;
+    if (shot.collidesWith(plane)) {
+      shot.removeFromScene();
+      plane.fadoutFromScene();
+      console.log("Fim de jogo.");
+      restartGame();
+      keep = false;
+    }
     return keep;
   });
 };
@@ -132,15 +209,18 @@ const showControlsInfoBox = () => {
 const render = () => {
   renderer.render(scene, camera);
   updateShots();
+  updateEnemyShots();
   updateEnemies();
   checkCollision();
   keyboardHandler();
   moveGround(ground);
   requestAnimationFrame(render);
-  stats.update(); // Update FPS
+  stats.update();
 };
 
-generateEnemiesInterval = setInterval(generateEnemies, 2000);
+game();
+setInterval(enemyShot, 3000);
+//generateEnemiesInterval = setInterval(generateEnemies, 2000);
 
 showControlsInfoBox();
 render();

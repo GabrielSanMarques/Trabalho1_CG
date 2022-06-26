@@ -1,16 +1,11 @@
 import { GameObject } from "./GameObject.js";
 
 function fadeOutEffect(objet, scene) {
-  var fadeEffect = setInterval(() => {
-    if (!objet.material.opacity) {
-      objet.material.opacity = 1;
-    }
+  const fadeEffect = setInterval(() => {
     if (objet.material.opacity > 0) {
       objet.material.opacity -= 0.2;
     } else {
       clearInterval(fadeEffect);
-    }
-    if (objet.material.opacity == 0) {
       scene.remove(objet);
     }
   }, 100);

@@ -31,12 +31,12 @@ export const createAirplane = async (scene) => {
     moveRight: (dt) => plane.translateZ(-dt * planeSpeed),
 
     disableCollision: () => {
-      const x = this.positionX();
-      const y = this.positionY();
-      const z = this.positionZ();
+      const x = plane.positionX();
+      const y = plane.positionY();
+      const z = plane.positionZ();
 
-      this.bb.makeEmpty();
-      this.obj.position.set(x, y, z);
+      plane.bb.makeEmpty();
+      plane.obj.position.set(x, y, z);
     },
   });
 };

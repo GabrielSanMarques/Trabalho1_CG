@@ -36,7 +36,6 @@ export const loadGLTFFile = (
 
       obj.traverse((node) => {
         if (node.material) {
-          console.log("node.material");
           node.material.side = THREE.DoubleSide;
         }
       });

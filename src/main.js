@@ -1,58 +1,44 @@
 import * as THREE from "three";
 import KeyboardState from "../libs/util/KeyboardState.js";
-import {
-  initRenderer,
-  initCamera,
-  initDefaultBasicLight,
-  InfoBox,
-} from "../libs/util/util.js";
 
-import { createGround, moveGround } from "./ground.js";
 import { AirPlane } from "./AirPlane.js";
-import { createCameraHolder } from "./cameraHolder.js";
 import { Shot } from "./Shot.js";
 import { Enemy } from "./Enemy.js";
-import { createDirectionalLight } from "./DirLight.js";
 
-import Stats from "../build/jsm/libs/stats.module.js"; //
-var stats = new Stats(); // To show FPS information //
-stats.showPanel(0); //
-document.body.appendChild(stats.dom); //
+import { createFpsStatsPanel } from "./stats.js";
+import { createRenderer } from "./renderer.js";
+import { createCameraHolder } from "./cameraHolder.js";
+import { createGround, moveGround } from "./ground.js";
+import { createDirectionalLight } from "./directionalLight.js";
 
-let generateEnemiesInterval;
+import { initCamera, InfoBox } from "../libs/util/util.js";
 
 const clock = new THREE.Clock();
 const keyboard = new KeyboardState();
 const scene = new THREE.Scene();
-//const renderer = initRenderer(); ANTIGO RENDER
-let renderer = new THREE.WebGL1Renderer(); // Novo Render
-document.getElementById("webgl-output").appendChild(renderer.domElement); //
-renderer.setSize(window.innerWidth, window.innerHeight); //
-renderer.shadowMap.enabled = true; //
-renderer.shadowMap.type = THREE.VSMShadowMap; // default
-renderer.shadowMap.needsUpdate = true;
-//renderer.setPixelRatio(window.devicePixelRatio * 0.5); //Diminuir qualidade para aumentar FPS
+const renderer = createRenderer();
 
 const camera = initCamera(new THREE.Vector3(0, 0, 0));
-let enemies = [];
-let shots = [];
-
-//initDefaultBasicLight(scene);//Antiga Luz
-createDirectionalLight(scene); //Luz Direcional
+const stats = createFpsStatsPanel(); // To show FPS information //
 
 const planeSpeed = 40;
 const plane = new AirPlane(scene);
 
-const ground = createGround();
-ground.receiveShadow = true; //Receber sombras
-scene.add(ground);
+const ground = createGround(scene);
 
+createDirectionalLight(scene);
 createCameraHolder(camera, scene);
+
+let enemies = [];
+let shots = [];
+
+let generateEnemiesInterval;
 
 const generateEnemies = () => {
   enemies.push(new Enemy(scene));
 
   clearInterval(generateEnemiesInterval);
+
   generateEnemiesInterval = setInterval(
     generateEnemies,
     THREE.MathUtils.randFloat(1, 5) * 300
@@ -85,11 +71,8 @@ const updateShots = () => {
   });
 };
 
-const shot = () => shots.push(new Shot(plane, scene));
-
-function reiniciando() {
-  window.location.reload();
-}
+const restartGame = (timeout) =>
+  setTimeout(() => window.location.reload(), timeout ?? 1000);
 
 const checkCollision = () => {
   enemies = enemies.filter((enemy) => {
@@ -98,7 +81,7 @@ const checkCollision = () => {
     if (enemy.collidesWith(plane)) {
       plane.fadoutFromScene();
       console.log("Fim de jogo.");
-      setTimeout(reiniciando, 1000);
+      restartGame();
     }
 
     shots = shots.filter((shot) => {
@@ -113,12 +96,16 @@ const checkCollision = () => {
   });
 };
 
+const shot = () => shots.push(new Shot(plane, scene));
+
 const screenUpperLimitZ = -35;
 const screenLowerLimitZ = 35;
 
 const keyboardHandler = () => {
+  const moveDistance = planeSpeed * clock.getDelta();
+
   keyboard.update();
-  var moveDistance = planeSpeed * clock.getDelta();
+
   if (keyboard.pressed("right")) plane.translateX(moveDistance);
   if (keyboard.pressed("left")) plane.translateX(-moveDistance);
   if (keyboard.pressed("up") && plane.positionZ() >= screenUpperLimitZ)
@@ -128,11 +115,11 @@ const keyboardHandler = () => {
   if (keyboard.down("ctrl")) shot(); // Missil Aereo
   if (keyboard.down("space")) shot(); //Misseis ar-terra
   if (keyboard.pressed("G")) plane.disableCollision(); // Evitar Colisão
-  if (keyboard.pressed("enter")) reiniciando(); //Retornar ao Inicio
+  if (keyboard.pressed("enter")) restartGame(); //Retornar ao Inicio
 };
 
 const showControlsInfoBox = () => {
-  let controls = new InfoBox();
+  const controls = new InfoBox();
 
   controls.add("Plane shooter");
   controls.addParagraph();
@@ -147,7 +134,6 @@ const render = () => {
   updateShots();
   updateEnemies();
   checkCollision();
-  //generateEnemies();
   keyboardHandler();
   moveGround(ground);
   requestAnimationFrame(render);

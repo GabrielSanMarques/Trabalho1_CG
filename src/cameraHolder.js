@@ -7,7 +7,8 @@ const camZ = 55;
 const camAngle = -50;
 
 const createCameraHolder = (camera, scene) => {
-  let camHolder = new THREE.Object3D();
+  const camHolder = new THREE.Object3D();
+
   camHolder.position.set(camX, camY, camZ);
   camHolder.rotateX(degreesToRadians(camAngle));
 

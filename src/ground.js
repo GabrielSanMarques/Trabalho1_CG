@@ -9,13 +9,19 @@ const heightSegments = 100 / 2;
 const speed = -15;
 const screenLimit = 10;
 
-const createGround = () => {
-  let ground = createGroundPlaneWired(
+const createGround = (scene) => {
+  const ground = createGroundPlaneWired(
     width,
     height,
     widthSegments,
     heightSegments
   );
+
+  if (scene) {
+    scene.add(ground);
+  }
+
+  ground.receiveShadow = true;
 
   return ground;
 };

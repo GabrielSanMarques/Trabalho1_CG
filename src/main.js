@@ -3,6 +3,7 @@ import KeyboardState from "../libs/util/KeyboardState.js";
 
 import { createAirplane } from "./airplane.js";
 import { Shot } from "./Shot.js";
+import { Bomb } from "./Bomb.js";
 import { Enemy } from "./Enemy.js";
 import { SideEnemy } from "./SideEnemy.js";
 import { ArcEnemy } from "./ArcEnemy.js";
@@ -185,7 +186,12 @@ const checkCollision = () => {
   });
 };
 
-const shot = () => shots.push(new Shot(plane, scene));
+const shot = (type) => {
+  if(type)
+    shots.push(new Bomb(plane, scene));
+  else
+    shots.push(new Shot(plane, scene));
+}
 
 const screenUpperLimitZ = -35;
 const screenLowerLimitZ = 35;
@@ -201,8 +207,8 @@ const keyboardHandler = () => {
     plane.moveForward(dt);
   if (keyboard.pressed("down") && plane.positionZ() <= screenLowerLimitZ)
     plane.moveBackward(dt);
-  if (keyboard.down("ctrl")) shot(); // Missil Aereo
-  if (keyboard.down("space")) shot(); //Misseis ar-terra
+  if (keyboard.down("ctrl")) shot(0); // Missil Aereo
+  if (keyboard.down("space")) shot(1); //Misseis ar-terra
   if (keyboard.pressed("G")) plane.disableCollision(); // Evitar Colisão
   if (keyboard.pressed("enter")) restartGame(); //Retornar ao Inicio
 };

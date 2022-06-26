@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import KeyboardState from "../libs/util/KeyboardState.js";
 
-import { AirPlane } from "./AirPlane.js";
+import { createAirplane } from "./airplane.js";
 import { Shot } from "./Shot.js";
 import { Enemy } from "./Enemy.js";
 import { SideEnemy } from "./SideEnemy.js";
@@ -24,8 +24,7 @@ const renderer = createRenderer();
 const camera = initCamera(new THREE.Vector3(0, 0, 0));
 const stats = createFpsStatsPanel(); // To show FPS information //
 
-const planeSpeed = 40;
-const plane = new AirPlane(scene);
+const plane = await createAirplane(scene);
 
 const ground = createGround(scene);
 
@@ -144,7 +143,7 @@ const checkCollision = () => {
     let keep = true;
 
     if (enemy.collidesWith(plane)) {
-      plane.fadoutFromScene();
+      plane.removeFromScene();
       console.log("Fim de jogo.");
       restartGame();
     }
@@ -164,7 +163,7 @@ const checkCollision = () => {
     let keep = true;
     if (shot.collidesWith(plane)) {
       shot.removeFromScene();
-      plane.fadoutFromScene();
+      plane.removeFromScene();
       console.log("Fim de jogo.");
       restartGame();
       keep = false;
@@ -179,16 +178,16 @@ const screenUpperLimitZ = -35;
 const screenLowerLimitZ = 35;
 
 const keyboardHandler = () => {
-  const moveDistance = planeSpeed * clock.getDelta();
+  const dt = clock.getDelta();
 
   keyboard.update();
 
-  if (keyboard.pressed("right")) plane.translateX(moveDistance);
-  if (keyboard.pressed("left")) plane.translateX(-moveDistance);
+  if (keyboard.pressed("right")) plane.moveRight(dt);
+  if (keyboard.pressed("left")) plane.moveLeft(dt);
   if (keyboard.pressed("up") && plane.positionZ() >= screenUpperLimitZ)
-    plane.translateY(moveDistance);
+    plane.moveForward(dt);
   if (keyboard.pressed("down") && plane.positionZ() <= screenLowerLimitZ)
-    plane.translateY(-moveDistance);
+    plane.moveBackward(dt);
   if (keyboard.down("ctrl")) shot(); // Missil Aereo
   if (keyboard.down("space")) shot(); //Misseis ar-terra
   if (keyboard.pressed("G")) plane.disableCollision(); // Evitar Colisão

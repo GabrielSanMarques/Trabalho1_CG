@@ -22,13 +22,14 @@ export class AirPlane extends FadoutObject {
     this.obj.rotateX(degreesToRadians(-90));
     this.obj.position.set(planeX, planeY, planeZ);
     this.obj.castShadow = true;
-    if (scene) {
-      this.addToScene(scene);
-    }
   }
 
   disableCollision() {
+    const x = this.positionX();
+    const y = this.positionY();
+    const z = this.positionZ();
+
     this.bb.makeEmpty();
-    this.obj.position.set(planeX, planeY, planeZ);
+    this.obj.position.set(x, y, z);
   }
 }

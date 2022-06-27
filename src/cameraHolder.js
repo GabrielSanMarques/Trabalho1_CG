@@ -6,9 +6,9 @@ const camY = 50;
 const camZ = 55;
 const camAngle = -50;
 
-const viewX = 145;
-const viewY = 50;
-const viewZ = 25;
+const viewX = 145.2;
+const viewY = 13.2;
+const viewZ = 26.5;
 const viewAngleX = -90;
 const viewAngleZ = -90;
 

@@ -1,9 +1,9 @@
 import * as THREE from "three";
 
 export const createRenderer = () => {
-  const renderer = new THREE.WebGL1Renderer();
+  const renderer = new THREE.WebGL1Renderer({ alpha: true });
 
-  document.getElementById("webgl-output").appendChild(renderer.domElement); //
+  document.body.appendChild(renderer.domElement); //
   renderer.setSize(window.innerWidth, window.innerHeight); //
   renderer.shadowMap.enabled = true; //
   renderer.shadowMap.type = THREE.VSMShadowMap; // default

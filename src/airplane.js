@@ -30,14 +30,5 @@ export const createAirplane = async (scene) => {
     moveBackward: (dt) => plane.translateX(dt * planeSpeed),
     moveLeft: (dt) => plane.translateZ(dt * planeSpeed),
     moveRight: (dt) => plane.translateZ(-dt * planeSpeed),
-
-    disableCollision: () => {
-      const x = plane.positionX();
-      const y = plane.positionY();
-      const z = plane.positionZ();
-
-      plane.bb.makeEmpty();
-      plane.obj.position.set(x, y, z);
-    },
   });
 };

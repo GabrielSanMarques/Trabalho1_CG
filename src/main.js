@@ -42,7 +42,9 @@ let enemies = [];
 let shots = [];
 let enemyShots = [];
 
-var sideDirection;
+let collisionEnabled = true;
+
+let sideDirection;
 
 createCameraHolder(camera, scene);
 createViewportHolder(viewportCam, scene);
@@ -155,17 +157,18 @@ const restartGame = (timeout) =>
   setTimeout(() => window.location.reload(), timeout ?? 1000);
 
 const decreseLife = (pts) => {
-  if (plane.life > 0) {
-    plane.life -= pts;
-    if (plane.life < 0) plane.life = 0;
-    for (let i = plane.life; i < hearts.length; i++) {
-      scene.remove(hearts[i]);
-    }
-    if (plane.life <= 0) {
-      plane.disableCollision();
-      plane.removeFromScene();
-      console.log("Fim de jogo.");
-      restartGame();
+  if (collisionEnabled) {
+    if (plane.life > 0) {
+      plane.life -= pts;
+      if (plane.life < 0) plane.life = 0;
+      for (let i = plane.life; i < hearts.length; i++) {
+        scene.remove(hearts[i]);
+      }
+      if (plane.life <= 0) {
+        plane.removeFromScene();
+        console.log("Fim de jogo.");
+        restartGame();
+      }
     }
   }
 };
@@ -218,6 +221,8 @@ const shot = (type) => {
 const screenUpperLimitZ = -35;
 const screenLowerLimitZ = 35;
 
+const disablePlaneCollision = () => (collisionEnabled = false);
+
 const keyboardHandler = () => {
   const dt = clock.getDelta();
 
@@ -231,7 +236,7 @@ const keyboardHandler = () => {
     plane.moveBackward(dt);
   if (keyboard.down("ctrl")) shot(0); // Missil Aereo
   if (keyboard.down("space")) shot(1); //Misseis ar-terra
-  if (keyboard.pressed("G")) plane.disableCollision(); // Evitar Colisão
+  if (keyboard.pressed("G")) disablePlaneCollision(); // Evitar Colisão
   if (keyboard.pressed("enter")) restartGame(); //Retornar ao Inicio
 };
 

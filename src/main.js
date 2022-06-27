@@ -141,7 +141,8 @@ const updateShots = () => {
     let keepShot = true;
 
     shot.move();
-    if (shot.positionZ() <= -45) {
+    if (shot.positionZ() <= -45 ||
+        shot.positionY() <= -10) {
       shot.removeFromScene();
       keepShot = false;
     }

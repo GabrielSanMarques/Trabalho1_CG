@@ -203,9 +203,7 @@ const checkCollision = () => {
     let keep = true;
     if (shot.collidesWith(plane)) {
       shot.removeFromScene();
-      plane.removeFromScene();
-      console.log("Fim de jogo.");
-      restartGame();
+      decreseLife(1);
       keep = false;
     }
     return keep;

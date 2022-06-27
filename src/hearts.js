@@ -25,7 +25,7 @@ const createHeart = (scene) => {
       geometry,
       new THREE.MeshPhongMaterial({ color: "red" })
     );
-    heart.position.set(150, 2, 0 + 12 * i);
+    heart.position.set(190, 2, 0 + 12 * i);
     heart.rotateX(Math.PI / 2);
     heart.rotateZ(Math.PI / 2);
     pilha.push(heart);

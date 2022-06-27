@@ -255,6 +255,8 @@ const showControlsInfoBox = () => {
 function dualRender() {
   var width = window.innerWidth;
   var height = window.innerHeight;
+  //console.log(width); //1323
+  //console.log(height); //1008
 
   //Set main camera
   renderer.setViewport(0, 0, width, height); // Reset viewport
@@ -264,12 +266,8 @@ function dualRender() {
   renderer.render(scene, camera);
 
   // // Set virtual camera viewport
-  var offset = 30;
-  var offset2 = 40;
-  var vcWidth = 600;
-  var vcHeight = 100;
-  renderer.setViewport(offset, offset2, vcWidth, vcHeight); // Set virtual camera viewport
-  renderer.setScissor(offset, offset2, vcWidth, vcHeight); // Set scissor with the same size as the viewport
+  renderer.setViewport(0, 0, width * 0.4, height * 0.1); // Set virtual camera viewport
+  renderer.setScissor(0, 0, width * 0.4, height * 0.1); // Set scissor with the same size as the viewport
   renderer.setScissorTest(true); // Enable scissor to paint only the scissor are (i.e., the small viewport)
   renderer.setClearAlpha(0);
   renderer.setClearColor(0x00ffff, 0); // border color

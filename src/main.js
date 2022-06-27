@@ -64,7 +64,7 @@ var game = () => {
       enemies.push(new SideEnemy(scene, -25 + 10 * i, 0.7, sideDirection));
       sideDirection *= -1;
     }
-  }, 5000);
+  }, 6000);
 
   //Wave 3
   sideDirection = 1;
@@ -73,13 +73,235 @@ var game = () => {
       enemies.push(new ArcEnemy(scene, 10 + 8 * i, 0.5, sideDirection));
       sideDirection *= -1;
     }
-  }, 10000);
+  }, 11000);
 
   //Wave 4
   setTimeout(() => {
     for (var i = 0; i < 6; i++)
       enemies.push(new GroundEnemy(scene, -40 + 16 * i, -60, plane));
-  }, 12000);
+  }, 16000);
+
+  //Wave 5
+  setTimeout(() => {
+    for (var i = 0; i < 5; i++)
+      enemies.push(new Enemy(scene, -30 + 15 * i, 0.4, plane));
+  }, 21000);
+
+  setTimeout(() => {
+    for (var i = 0; i < 5; i++)
+      enemies.push(new Enemy(scene, -30 + 15 * i, 0.4, plane));
+  }, 23000);
+
+  setTimeout(() => {
+    for (var i = 0; i < 5; i++)
+      enemies.push(new Enemy(scene, -30 + 15 * i, 0.4, plane));
+  }, 24000);
+
+  //Wave 6
+  sideDirection = 1;
+  setTimeout(() => {
+    for (var i = 0; i < 6; i++) {
+      enemies.push(new ArcEnemy(scene, 10 + 8 * i, 0.5, sideDirection));
+      sideDirection *= -1;
+    }
+  }, 30000);
+
+  sideDirection = 1;
+  setTimeout(() => {
+    for (var i = 0; i < 6; i++) {
+      enemies.push(new SideEnemy(scene, -25 + 10 * i, 0.7, sideDirection));
+      sideDirection *= -1;
+    }
+  }, 32000);
+
+  //Wave 7
+  setTimeout(() => {
+    for (var i = 0; i < 6; i++)
+      enemies.push(new Enemy(scene, -40 + 16 * i, 0.4, plane));
+  }, 37000);
+
+  setTimeout(() => {
+    for (var i = 0; i < 6; i++)
+      enemies.push(new GroundEnemy(scene, -40 + 16 * i, -60, plane));
+  }, 37000);
+
+  sideDirection = 1;
+  setTimeout(() => {
+    for (var i = 0; i < 6; i++) {
+      enemies.push(new SideEnemy(scene, -25 + 10 * i, 0.7, sideDirection));
+      sideDirection *= -1;
+    }
+  }, 39000);
+
+  //Wave 8
+  setTimeout(() => {
+    for (var i = 0; i < 8; i++)
+      enemies.push(new GroundEnemy(scene, -49 + 14 * i, -60, plane));
+  }, 44000);
+
+  sideDirection = 1;
+  setTimeout(() => {
+    for (var i = 0; i < 6; i++) {
+      enemies.push(new SideEnemy(scene, -25 + 10 * i, 0.7, sideDirection));
+      sideDirection *= -1;
+    }
+  }, 44000);
+
+  setTimeout(() => {
+    for (var i = 0; i < 8; i++)
+      enemies.push(new Enemy(scene, -49 + 14 * i, 0.4, plane));
+  }, 46000);
+
+  //Wave 8
+  setTimeout(() => {
+    for (var i = 0; i < 6; i++)
+      enemies.push(new GroundEnemy(scene, -35 + 14 * i, -60, plane));
+  }, 51000);
+
+  setTimeout(() => {
+    for (var i = 0; i < 8; i++)
+      enemies.push(new GroundEnemy(scene, -49 + 14 * i, -60, plane));
+  }, 53000);
+
+  setTimeout(() => {
+    for (var i = 0; i < 10; i++)
+      enemies.push(new GroundEnemy(scene, -63 + 14 * i, -60, plane));
+  }, 55000);
+
+  sideDirection = 1;
+  setTimeout(() => {
+    for (var i = 0; i < 6; i++) {
+      enemies.push(new SideEnemy(scene, -25 + 10 * i, 0.7, sideDirection));
+      sideDirection *= -1;
+    }
+  }, 55000);
+
+  //Wave 9
+  setTimeout(() => {
+    for (var i = 0; i < 8; i++)
+      enemies.push(new Enemy(scene, -49 + 14 * i, 0.4, plane));
+  }, 60000);
+
+  setTimeout(() => {
+    for (var i = 0; i < 8; i++)
+      enemies.push(new Enemy(scene, -49 + 14 * i, 0.4, plane));
+  }, 62000);
+
+  sideDirection = 1;
+  setTimeout(() => {
+    for (var i = 0; i < 6; i++) {
+      enemies.push(new ArcEnemy(scene, 10 + 8 * i, 0.5, sideDirection));
+      sideDirection *= -1;
+    }
+  }, 62000);
+
+  setTimeout(() => {
+    for (var i = 0; i < 8; i++)
+      enemies.push(new Enemy(scene, -49 + 14 * i, 0.4, plane));
+  }, 64000);
+
+  //Wave 10
+  sideDirection = 1;
+  setTimeout(() => {
+    for (var i = 0; i < 8; i++) {
+      enemies.push(new ArcEnemy(scene, 10 + 6 * i, 0.5, sideDirection));
+      sideDirection *= -1;
+    }
+  }, 69000);
+
+  sideDirection = -1;
+  setTimeout(() => {
+    for (var i = 0; i < 8; i++) {
+      enemies.push(new ArcEnemy(scene, 5 + 6 * i, 0.5, sideDirection));
+      sideDirection *= -1;
+    }
+  }, 72000);
+
+  sideDirection = 1;
+  setTimeout(() => {
+    for (var i = 0; i < 8; i++) {
+      enemies.push(new ArcEnemy(scene, 10 + 6 * i, 0.5, sideDirection));
+      sideDirection *= -1;
+    }
+  }, 75000);
+
+  //Wave 11
+  setTimeout(() => {
+    for (var i = 0; i < 6; i++)
+      enemies.push(new GroundEnemy(scene, -35 + 14 * i, -60, plane));
+  }, 80000);
+
+  setTimeout(() => {
+    for (var i = 0; i < 8; i++)
+      enemies.push(new GroundEnemy(scene, -49 + 14 * i, -60, plane));
+  }, 83000);
+
+  setTimeout(() => {
+    for (var i = 0; i < 10; i++)
+      enemies.push(new GroundEnemy(scene, -63 + 14 * i, -60, plane));
+  }, 86000);
+
+  setTimeout(() => {
+    for (var i = 0; i < 10; i++)
+      enemies.push(new GroundEnemy(scene, -63 + 14 * i, -60, plane));
+  }, 89000);
+
+  setTimeout(() => {
+    for (var i = 0; i < 8; i++)
+      enemies.push(new GroundEnemy(scene, -49 + 14 * i, -60, plane));
+  }, 92000);
+
+  setTimeout(() => {
+    for (var i = 0; i < 6; i++)
+      enemies.push(new GroundEnemy(scene, -35 + 14 * i, -60, plane));
+  }, 95000);
+
+  //Wave 12
+  setTimeout(() => {
+    for (var i = 0; i < 6; i++)
+      enemies.push(new GroundEnemy(scene, -35 + 14 * i, -60, plane));
+  }, 100000);
+
+  sideDirection = 1;
+  setTimeout(() => {
+    for (var i = 0; i < 8; i++) {
+      enemies.push(new ArcEnemy(scene, 10 + 6 * i, 0.5, sideDirection));
+      sideDirection *= -1;
+    }
+  }, 102000);
+
+  setTimeout(() => {
+    for (var i = 0; i < 8; i++)
+      enemies.push(new GroundEnemy(scene, -49 + 14 * i, -60, plane));
+  }, 105000);
+
+  sideDirection = -1;
+  setTimeout(() => {
+    for (var i = 0; i < 8; i++) {
+      enemies.push(new ArcEnemy(scene, 10 + 6 * i, 0.5, sideDirection));
+      sideDirection *= -1;
+    }
+  }, 107000);
+
+  setTimeout(() => {
+    for (var i = 0; i < 10; i++)
+      enemies.push(new GroundEnemy(scene, -63 + 14 * i, -60, plane));
+  }, 110000);
+
+  setTimeout(() => {
+    for (var i = 0; i < 8; i++)
+      enemies.push(new Enemy(scene, -49 + 14 * i, 0.4, plane));
+  }, 115000);
+
+  setTimeout(() => {
+    for (var i = 0; i < 8; i++)
+      enemies.push(new Enemy(scene, -49 + 14 * i, 0.4, plane));
+  }, 118000);
+
+  setTimeout(() => {
+    for (var i = 0; i < 8; i++)
+      enemies.push(new Enemy(scene, -49 + 14 * i, 0.4, plane));
+  }, 121000);
 };
 
 /*

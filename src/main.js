@@ -13,9 +13,10 @@ import { GroundEnemyShot } from "./GroundEnemyShot.js";
 
 import { createFpsStatsPanel } from "./stats.js";
 import { createRenderer } from "./renderer.js";
-import { createCameraHolder } from "./cameraHolder.js";
+import { createCameraHolder, createViewportHolder } from "./cameraHolder.js";
 import { createGround, moveGround } from "./ground.js";
 import { createDirectionalLight } from "./directionalLight.js";
+import { createHeart } from "./hearts.js";
 
 import { initCamera, InfoBox } from "../libs/util/util.js";
 
@@ -25,11 +26,14 @@ const scene = new THREE.Scene();
 const renderer = createRenderer();
 
 const camera = initCamera(new THREE.Vector3(0, 0, 0));
+const viewportCam = initCamera(new THREE.Vector3(0, 0, 0));
 const stats = createFpsStatsPanel(); // To show FPS information //
 
 const plane = await createAirplane(scene);
 
 const ground = createGround(scene);
+
+const hearts = createHeart(scene);
 
 createDirectionalLight(scene);
 createCameraHolder(camera, scene);
@@ -41,6 +45,7 @@ let enemyShots = [];
 var sideDirection;
 
 createCameraHolder(camera, scene);
+createViewportHolder(viewportCam, scene);
 
 var game = () => {
   //Wave 1
@@ -68,12 +73,10 @@ var game = () => {
   }, 10000);
 
   //Wave 4
-  setTimeout(
-    () => {
-      for(var i = 0; i < 6; i++)
-        enemies.push(new GroundEnemy(scene, -40 + 16 * i, -60, plane));
-    }, 12000
-  ); 
+  setTimeout(() => {
+    for (var i = 0; i < 6; i++)
+      enemies.push(new GroundEnemy(scene, -40 + 16 * i, -60, plane));
+  }, 12000);
 };
 
 /*
@@ -111,10 +114,9 @@ const updateEnemies = () => {
 
 const enemyShot = () => {
   enemies.forEach((enemy) => {
-    if(enemy instanceof GroundEnemy)
+    if (enemy instanceof GroundEnemy)
       enemyShots.push(new GroundEnemyShot(enemy, scene, plane));
-    else
-      enemyShots.push(new AirEnemyShot(enemy, scene, plane));
+    else enemyShots.push(new AirEnemyShot(enemy, scene, plane));
   });
 };
 
@@ -152,14 +154,38 @@ const updateShots = () => {
 const restartGame = (timeout) =>
   setTimeout(() => window.location.reload(), timeout ?? 1000);
 
+const decreseLife = (pts) => {
+  if (plane.life > 0) {
+    plane.life -= pts;
+    if (plane.life < 0) plane.life = 0;
+    for (let i = plane.life; i < hearts.length; i++) {
+      scene.remove(hearts[i]);
+    }
+    if (plane.life <= 0) {
+      plane.disableCollision();
+      plane.removeFromScene();
+      console.log("Fim de jogo.");
+      restartGame();
+    }
+  }
+};
+
+const increseLife = (pts) => {
+  if (plane.life < 5) {
+    plane.life += pts;
+    if (plane.life > 5) plane.life = 5;
+    for (let i = 0; i < plane.life; i++) scene.add(hearts[i]);
+  }
+};
+
 const checkCollision = () => {
   enemies = enemies.filter((enemy) => {
     let keep = true;
 
     if (enemy.collidesWith(plane)) {
-      plane.removeFromScene();
-      console.log("Fim de jogo.");
-      restartGame();
+      decreseLife(2);
+      enemy.fadoutFromScene();
+      keep = false;
     }
 
     shots = shots.filter((shot) => {
@@ -187,11 +213,9 @@ const checkCollision = () => {
 };
 
 const shot = (type) => {
-  if(type)
-    shots.push(new Bomb(plane, scene));
-  else
-    shots.push(new Shot(plane, scene));
-}
+  if (type) shots.push(new Bomb(plane, scene));
+  else shots.push(new Shot(plane, scene));
+};
 
 const screenUpperLimitZ = -35;
 const screenLowerLimitZ = 35;

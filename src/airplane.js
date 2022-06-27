@@ -25,6 +25,7 @@ export const createAirplane = async (scene) => {
   obj.castShadow = true;
 
   return Object.assign(plane, {
+    life: 5,
     moveForward: (dt) => plane.translateX(-dt * planeSpeed),
     moveBackward: (dt) => plane.translateX(dt * planeSpeed),
     moveLeft: (dt) => plane.translateZ(dt * planeSpeed),

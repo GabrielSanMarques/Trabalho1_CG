@@ -6,6 +6,12 @@ const camY = 50;
 const camZ = 55;
 const camAngle = -50;
 
+const viewX = 145;
+const viewY = 50;
+const viewZ = 25;
+const viewAngleX = -90;
+const viewAngleZ = -90;
+
 const createCameraHolder = (camera, scene) => {
   const camHolder = new THREE.Object3D();
 
@@ -18,4 +24,16 @@ const createCameraHolder = (camera, scene) => {
   return camHolder;
 };
 
-export { createCameraHolder, camAngle };
+const createViewportHolder = (camera, scene) => {
+  let viewHolder = new THREE.Object3D();
+  viewHolder.position.set(viewX, viewY, viewZ);
+  viewHolder.rotateX(degreesToRadians(viewAngleX));
+  viewHolder.rotateZ(degreesToRadians(viewAngleZ));
+
+  viewHolder.add(camera);
+  scene.add(viewHolder);
+
+  return viewHolder;
+};
+
+export { createCameraHolder, createViewportHolder, camAngle };

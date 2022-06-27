@@ -143,8 +143,7 @@ const updateShots = () => {
     let keepShot = true;
 
     shot.move();
-    if (shot.positionZ() <= -45 ||
-        shot.positionY() <= -10) {
+    if (shot.positionZ() <= -45 || shot.positionY() <= -10) {
       shot.removeFromScene();
       keepShot = false;
     }
@@ -249,8 +248,33 @@ const showControlsInfoBox = () => {
   controls.show();
 };
 
-const render = () => {
+function dualRender() {
+  var width = window.innerWidth;
+  var height = window.innerHeight;
+
+  //Set main camera
+  renderer.setViewport(0, 0, width, height); // Reset viewport
+  renderer.setScissorTest(false); // Disable scissor to paint the entire window
+  renderer.setClearAlpha(1);
+  renderer.clear(); // Clean the window
   renderer.render(scene, camera);
+
+  // // Set virtual camera viewport
+  var offset = 30;
+  var vcWidth = 700;
+  var vcHeidth = 300;
+  renderer.setViewport(offset, offset, vcWidth, vcHeidth); // Set virtual camera viewport
+  renderer.setScissor(offset, offset, vcWidth, vcHeidth); // Set scissor with the same size as the viewport
+  renderer.setScissorTest(true); // Enable scissor to paint only the scissor are (i.e., the small viewport)
+  renderer.setClearColor(0x000000, 0);
+  // the default // Use a darker clear color in the small viewport
+  renderer.clear(); // Clean the small viewport
+
+  renderer.render(scene, viewportCam); // Render scene of the virtual camera
+}
+
+const render = () => {
+  dualRender();
   updateShots();
   updateEnemyShots();
   updateEnemies();

@@ -9,14 +9,23 @@ const planeZ = 35;
 
 const planeSpeed = 40;
 
+let _modelObj = null;
+
+const getObject = async () => {
+  if (_modelObj == null) {
+    _modelObj = await loadGLTFFile(
+      "../assets/objects/",
+      "airplane",
+      4.0,
+      180,
+      true
+    );
+  }
+  return _modelObj.clone();
+};
+
 export const createAirplane = async (scene) => {
-  const obj = await loadGLTFFile(
-    "../assets/objects/",
-    "airplane",
-    4.0,
-    180,
-    true
-  );
+  const obj = await getObject();
   const bb = new THREE.Sphere(obj.position, 1);
   const plane = new GameObject(obj, bb, scene);
 

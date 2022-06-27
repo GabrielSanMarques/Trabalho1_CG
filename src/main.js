@@ -23,10 +23,11 @@ import { initCamera, InfoBox } from "../libs/util/util.js";
 const clock = new THREE.Clock();
 const keyboard = new KeyboardState();
 const scene = new THREE.Scene();
+scene.background = new THREE.Color(0xffffff);
 const renderer = createRenderer();
 
 const camera = initCamera(new THREE.Vector3(0, 0, 0));
-const viewportCam = initCamera(new THREE.Vector3(0, 0, 0));
+const viewportCam = new THREE.PerspectiveCamera(50, 48 / 7.8, 1, 500);
 const stats = createFpsStatsPanel(); // To show FPS information //
 
 const plane = await createAirplane(scene);
@@ -258,18 +259,20 @@ function dualRender() {
   //Set main camera
   renderer.setViewport(0, 0, width, height); // Reset viewport
   renderer.setScissorTest(false); // Disable scissor to paint the entire window
-  renderer.setClearAlpha(1);
+  renderer.setClearAlpha(0);
   renderer.clear(); // Clean the window
   renderer.render(scene, camera);
 
   // // Set virtual camera viewport
   var offset = 30;
-  var vcWidth = 700;
-  var vcHeidth = 300;
-  renderer.setViewport(offset, offset, vcWidth, vcHeidth); // Set virtual camera viewport
-  renderer.setScissor(offset, offset, vcWidth, vcHeidth); // Set scissor with the same size as the viewport
+  var offset2 = 40;
+  var vcWidth = 600;
+  var vcHeight = 100;
+  renderer.setViewport(offset, offset2, vcWidth, vcHeight); // Set virtual camera viewport
+  renderer.setScissor(offset, offset2, vcWidth, vcHeight); // Set scissor with the same size as the viewport
   renderer.setScissorTest(true); // Enable scissor to paint only the scissor are (i.e., the small viewport)
-  renderer.setClearColor(0x000000, 0);
+  renderer.setClearAlpha(0);
+  renderer.setClearColor(0x00ffff, 0); // border color
   // the default // Use a darker clear color in the small viewport
   renderer.clear(); // Clean the small viewport
 

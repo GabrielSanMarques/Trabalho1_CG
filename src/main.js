@@ -2,7 +2,7 @@ import * as THREE from "three";
 import KeyboardState from "../libs/util/KeyboardState.js";
 
 import { createAirplane } from "./airplane.js";
-import { Shot } from "./Shot.js";
+import { createShot, loadShotImage } from "./shot.js";
 import { Bomb } from "./Bomb.js";
 import { Enemy } from "./Enemy.js";
 import { SideEnemy } from "./SideEnemy.js";
@@ -80,6 +80,8 @@ var game = () => {
       enemies.push(new GroundEnemy(scene, -40 + 16 * i, -60, plane));
   }, 12000);
 };
+
+await loadShotImage();
 
 /*
 let generateEnemiesInterval;
@@ -213,10 +215,9 @@ const checkCollision = () => {
   });
 };
 
-const shot = (type) => {
-  if (type) shots.push(new Bomb(plane, scene));
-  else shots.push(new Shot(plane, scene));
-};
+const shot = async () => shots.push(await createShot(plane, scene));
+
+const bombShot = () => shots.push(new Bomb(plane, scene));
 
 const screenUpperLimitZ = -35;
 const screenLowerLimitZ = 35;
@@ -234,8 +235,8 @@ const keyboardHandler = () => {
     plane.moveForward(dt);
   if (keyboard.pressed("down") && plane.positionZ() <= screenLowerLimitZ)
     plane.moveBackward(dt);
-  if (keyboard.down("ctrl")) shot(0); // Missil Aereo
-  if (keyboard.down("space")) shot(1); //Misseis ar-terra
+  if (keyboard.down("ctrl")) shot(); // Missil Aereo
+  if (keyboard.down("space")) bombShot(); //Misseis ar-terra
   if (keyboard.pressed("G")) disablePlaneCollision(); // Evitar Colisão
   if (keyboard.pressed("enter")) restartGame(); //Retornar ao Inicio
 };

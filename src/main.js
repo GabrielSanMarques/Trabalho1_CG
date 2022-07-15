@@ -516,5 +516,9 @@ game();
 setInterval(enemyShot, 3000);
 //generateEnemiesInterval = setInterval(generateEnemies, 2000);
 
+const audio = new Audio("../assets/audio/audio.mp3");
+audio.load();
+audio.play();
+
 showControlsInfoBox();
 render();

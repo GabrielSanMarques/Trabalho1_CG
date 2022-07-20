@@ -23,7 +23,7 @@ import { initCamera, InfoBox } from "../libs/util/util.js";
 const clock = new THREE.Clock();
 const keyboard = new KeyboardState();
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0xffffff);
+//scene.background = new THREE.Color(0xffffff);
 const renderer = createRenderer();
 
 const camera = initCamera(new THREE.Vector3(0, 0, 0));
@@ -484,7 +484,8 @@ function dualRender() {
   //Set main camera
   renderer.setViewport(0, 0, width, height); // Reset viewport
   renderer.setScissorTest(false); // Disable scissor to paint the entire window
-  renderer.setClearAlpha(0);
+  //renderer.setClearAlpha(0);
+  renderer.setClearColor("rgb(0,70,170)");
   renderer.clear(); // Clean the window
   renderer.render(scene, camera);
 
@@ -492,11 +493,9 @@ function dualRender() {
   renderer.setViewport(0, 0, width * 0.4, height * 0.1); // Set virtual camera viewport
   renderer.setScissor(0, 0, width * 0.4, height * 0.1); // Set scissor with the same size as the viewport
   renderer.setScissorTest(true); // Enable scissor to paint only the scissor are (i.e., the small viewport)
-  renderer.setClearAlpha(0);
-  renderer.setClearColor(0x00ffff, 0); // border color
-  // the default // Use a darker clear color in the small viewport
-  renderer.clear(); // Clean the small viewport
-
+  //renderer.setClearAlpha(0);
+  renderer.setClearColor(0x00ff00, 0); // border color
+  if (renderer.autoclear) renderer.clear(); //Set Transparency
   renderer.render(scene, viewportCam); // Render scene of the virtual camera
 }
 

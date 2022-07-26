@@ -35,6 +35,10 @@ export class GameObject {
     this.obj.translateZ(dz);
   }
 
+  translateZ1(dz) {
+    this.obj.position.x += dz;
+  }
+
   collidesWith(gameObj) {
     return this.bb.intersectsSphere(gameObj.bb);
   }

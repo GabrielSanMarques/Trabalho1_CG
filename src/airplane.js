@@ -37,7 +37,22 @@ export const createAirplane = async (scene) => {
     life: 5,
     moveForward: (dt) => plane.translateX(-dt * planeSpeed),
     moveBackward: (dt) => plane.translateX(dt * planeSpeed),
-    moveLeft: (dt) => plane.translateZ(dt * planeSpeed),
-    moveRight: (dt) => plane.translateZ(-dt * planeSpeed),
+    moveLeft: (dt) => {
+      plane.translateZ1(-dt * planeSpeed);
+      obj.rotateX(1.5 * dt);
+      if (obj.rotation.y <= -0.75) obj.rotateX(dt);
+      if (obj.rotation.y > -0.75) obj.rotation.y = -0.75;
+      console.log(obj.rotation.y);
+    },
+    moveRight: (dt) => {
+      plane.translateZ1(dt * planeSpeed);
+      obj.rotateX(-1.5 * dt);
+      if (obj.rotation.y <= -0.75) obj.rotateX(-dt);
+      if (obj.rotation.y > -0.75) obj.rotation.y = -0.75;
+      console.log(obj.rotation.y);
+    },
   });
 };
+
+//Inicial y=-1.55
+//Ideal y = -0.75

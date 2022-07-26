@@ -464,6 +464,16 @@ const keyboardHandler = () => {
   if (keyboard.pressed("enter")) restartGame(); //Retornar ao Inicio
 };
 
+var pause = false;
+document.addEventListener("keydown", onDocumentKeyDown, false);
+function onDocumentKeyDown(event) {
+  var keyCode = event.which;
+  if (keyCode == 80) {
+    pause = !pause;
+  }
+  render();
+}
+
 const showControlsInfoBox = () => {
   const controls = new InfoBox();
 
@@ -507,7 +517,7 @@ const render = () => {
   checkCollision();
   keyboardHandler();
   moveGround(ground);
-  requestAnimationFrame(render);
+  if (!pause) requestAnimationFrame(render);
   stats.update();
 };
 

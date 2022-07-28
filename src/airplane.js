@@ -6,7 +6,7 @@ import { loadGLTFFile } from "./glft.js";
 const planeX = 0;
 const planeY = 2;
 const planeZ = 35;
-
+var direcao = true;
 const planeSpeed = 40;
 
 let _modelObj = null;
@@ -38,6 +38,7 @@ export const createAirplane = async (scene) => {
     moveForward: (dt) => plane.translateX(-dt * planeSpeed),
     moveBackward: (dt) => plane.translateX(dt * planeSpeed),
     moveLeft: (dt) => {
+      direcao = true;
       plane.translateZ1(-dt * planeSpeed);
       obj.rotateX(1.5 * dt);
       if (obj.rotation.y <= -0.75) obj.rotateX(dt);
@@ -45,10 +46,18 @@ export const createAirplane = async (scene) => {
       console.log(obj.rotation.y);
     },
     moveRight: (dt) => {
+      direcao = false;
       plane.translateZ1(dt * planeSpeed);
       obj.rotateX(-1.5 * dt);
       if (obj.rotation.y <= -0.75) obj.rotateX(-dt);
       if (obj.rotation.y > -0.75) obj.rotation.y = -0.75;
+      console.log(obj.rotation.y);
+    },
+    equilibrio: (dt) => {
+      if (obj.rotation.y > -1.45) {
+        if (direcao) obj.rotateX(-1.5 * dt);
+        else obj.rotateX(1.5 * dt);
+      } else obj.rotation.y = -1.55;
       console.log(obj.rotation.y);
     },
   });

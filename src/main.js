@@ -451,7 +451,7 @@ const keyboardHandler = () => {
   const dt = clock.getDelta();
 
   keyboard.update();
-
+  plane.equilibrio(dt);
   if (keyboard.pressed("right")) plane.moveRight(dt);
   if (keyboard.pressed("left")) plane.moveLeft(dt);
   if (keyboard.pressed("up") && plane.positionZ() >= screenUpperLimitZ)

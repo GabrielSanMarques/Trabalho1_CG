@@ -36,6 +36,7 @@ export class GameObject {
   }
 
   translateZ1(dz) {
+    //Função para mover sobre o eixo do plano em vez do eixo do objeto
     this.obj.position.x += dz;
   }
 

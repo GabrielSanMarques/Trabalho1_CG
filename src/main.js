@@ -16,6 +16,12 @@ import { createDirectionalLight } from "./directionalLight.js";
 import { createHeart } from "./hearts.js";
 
 import { initCamera, InfoBox } from "../libs/util/util.js";
+import {
+  somTrilhaSonora,
+  somTiroAdversario,
+  somColisao,
+  somTiroPrincipal,
+} from "./sound.js";
 
 const clock = new THREE.Clock();
 const keyboard = new KeyboardState();
@@ -124,6 +130,7 @@ const checkCollision = () => {
       decreseLife(2);
       enemy.fadoutFromScene();
       keep = false;
+      somColisao();
     }
 
     shots = shots.filter((shot) => {
@@ -131,6 +138,7 @@ const checkCollision = () => {
         enemy.fadoutFromScene();
         shot.removeFromScene();
         keep = false;
+        somColisao();
       }
       return keep;
     });
@@ -168,8 +176,14 @@ const keyboardHandler = () => {
     plane.moveForward(dt);
   if (keyboard.pressed("down") && plane.positionZ() <= screenLowerLimitZ)
     plane.moveBackward(dt);
-  if (keyboard.down("ctrl")) shot(); // Missil Aereo
-  if (keyboard.down("space")) bombShot(); //Misseis ar-terra
+  if (keyboard.down("ctrl")) {
+    shot(); // Missil Aereo
+    somTiroPrincipal();
+  }
+  if (keyboard.down("space")) {
+    bombShot(); //Misseis ar-terra
+    somTiroPrincipal();
+  }
   if (keyboard.pressed("G")) disablePlaneCollision(); // Evitar Colisão
   if (keyboard.pressed("enter")) restartGame(); //Retornar ao Inicio
 };
@@ -245,6 +259,8 @@ const togglePause = () => {
     animationFrameRequest = undefined;
   }
 };
+
+somTrilhaSonora();
 
 showControlsInfoBox();
 makeAnimationFrameRequest();

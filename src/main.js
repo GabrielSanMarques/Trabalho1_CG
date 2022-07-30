@@ -23,15 +23,18 @@ import {
   somTiroPrincipal,
 } from "./sound.js";
 
+///////////////////
+//// Variáveis ////
+///////////////////
+
 const clock = new THREE.Clock();
 const keyboard = new KeyboardState();
 const scene = new THREE.Scene();
-//scene.background = new THREE.Color(0xffffff);
 const renderer = createRenderer();
 
 const camera = initCamera(new THREE.Vector3(0, 0, 0));
 const viewportCam = new THREE.PerspectiveCamera(50, 48 / 7.8, 1, 500);
-const stats = createFpsStatsPanel(); // To show FPS information //
+const stats = createFpsStatsPanel();
 
 const plane = await createAirplane(scene);
 
@@ -39,8 +42,8 @@ const ground = createGround(scene);
 
 const hearts = createHeart(scene);
 
-createDirectionalLight(scene);
-createCameraHolder(camera, scene);
+const screenUpperLimitZ = -35;
+const screenLowerLimitZ = 35;
 
 let enemies = [];
 let shots = [];
@@ -48,10 +51,14 @@ let enemyShots = [];
 
 let collisionEnabled = true;
 
-createCameraHolder(camera, scene);
-createViewportHolder(viewportCam, scene);
+let animationFrameRequest = undefined;
 
-await loadShotImage();
+let canShot = true;
+let lastShotTime = -3000;
+
+/////////////////
+//// Funções ////
+/////////////////
 
 const updateEnemies = () => {
   enemies = enemies.filter((enemy) => {
@@ -156,30 +163,34 @@ const checkCollision = () => {
   });
 };
 
-const shot = async () => shots.push(await createShot(plane, scene));
+const shot = async (timeStep) => {
+  if (canShot || timeStep - lastShotTime > 500) {
+    somTiroPrincipal();
+    shots.push(await createShot(plane, scene));
+
+    lastShotTime = timeStep;
+    canShot = false;
+  }
+};
 
 const bombShot = () => shots.push(new Bomb(plane, scene));
 
-const screenUpperLimitZ = -35;
-const screenLowerLimitZ = 35;
-
 const disablePlaneCollision = () => (collisionEnabled = false);
 
-const keyboardHandler = () => {
+const keyboardHandler = (timeStep) => {
   const dt = clock.getDelta();
 
   keyboard.update();
   plane.equilibrio(dt);
+
   if (keyboard.pressed("right")) plane.moveRight(dt);
   if (keyboard.pressed("left")) plane.moveLeft(dt);
   if (keyboard.pressed("up") && plane.positionZ() >= screenUpperLimitZ)
     plane.moveForward(dt);
   if (keyboard.pressed("down") && plane.positionZ() <= screenLowerLimitZ)
     plane.moveBackward(dt);
-  if (keyboard.down("ctrl")) {
-    shot(); // Missil Aereo
-    somTiroPrincipal();
-  }
+  if (keyboard.pressed("ctrl")) shot(timeStep); // Missil Aereo
+
   if (keyboard.down("space")) {
     bombShot(); //Misseis ar-terra
     somTiroPrincipal();
@@ -187,12 +198,6 @@ const keyboardHandler = () => {
   if (keyboard.pressed("G")) disablePlaneCollision(); // Evitar Colisão
   if (keyboard.pressed("enter")) restartGame(); //Retornar ao Inicio
 };
-
-window.addEventListener("keydown", (e) => {
-  if (e.key == "p") {
-    togglePause();
-  }
-});
 
 const showControlsInfoBox = () => {
   const controls = new InfoBox();
@@ -208,44 +213,39 @@ const showControlsInfoBox = () => {
 function dualRender() {
   var width = window.innerWidth;
   var height = window.innerHeight;
-  //console.log(width); //1323
-  //console.log(height); //1008
 
-  //Set main camera
-  renderer.setViewport(0, 0, width, height); // Reset viewport
-  renderer.setScissorTest(false); // Disable scissor to paint the entire window
-  //renderer.setClearAlpha(0);
+  // Set main camera
+  renderer.setViewport(0, 0, width, height);
+  renderer.setScissorTest(false);
   renderer.setClearColor("rgb(0,70,170)");
-  renderer.clear(); // Clean the window
+  renderer.clear();
   renderer.render(scene, camera);
 
-  // // Set virtual camera viewport
-  renderer.setViewport(0, 0, width * 0.4, height * 0.1); // Set virtual camera viewport
-  renderer.setScissor(0, 0, width * 0.4, height * 0.1); // Set scissor with the same size as the viewport
-  renderer.setScissorTest(true); // Enable scissor to paint only the scissor are (i.e., the small viewport)
-  //renderer.setClearAlpha(0);
-  renderer.setClearColor(0x00ff00, 0); // border color
-  if (renderer.autoclear) renderer.clear(); //Set Transparency
-  renderer.render(scene, viewportCam); // Render scene of the virtual camera
+  // Set virtual camera viewport
+  renderer.setViewport(0, 0, width * 0.4, height * 0.1);
+  renderer.setScissor(0, 0, width * 0.4, height * 0.1);
+  renderer.setScissorTest(true);
+
+  renderer.setClearColor(0x00ff00, 0);
+  if (renderer.autoclear) renderer.clear();
+  renderer.render(scene, viewportCam);
 }
 
-const update = () => {
+const update = (timeStep) => {
   dualRender();
   updateShots();
   updateEnemyShots();
   updateEnemies();
   checkCollision();
-  keyboardHandler();
+  keyboardHandler(timeStep);
   moveGround(ground);
   stats.update();
 };
 
-let animationFrameRequest = undefined;
-
 const makeAnimationFrameRequest = () => {
-  animationFrameRequest = requestAnimationFrame(() => {
+  animationFrameRequest = requestAnimationFrame((timeStep) => {
     makeAnimationFrameRequest();
-    update();
+    update(timeStep);
   });
 };
 
@@ -260,7 +260,39 @@ const togglePause = () => {
   }
 };
 
+const loadAssetsAndStart = async () => {
+  await loadShotImage();
+
+  makeAnimationFrameRequest();
+};
+
+const keydownHandler = (e) => {
+  if (e.key == "p") {
+    togglePause();
+  }
+};
+
+const keyupHandler = (e) => {
+  if (e.key == "Control") {
+    canShot = true;
+  }
+};
+
+///////////////////////
+//// Inicialização ////
+///////////////////////
+
+window.addEventListener("keydown", keydownHandler);
+window.addEventListener("keyup", keyupHandler);
+
+createDirectionalLight(scene);
+createCameraHolder(camera, scene);
+
+createCameraHolder(camera, scene);
+createViewportHolder(viewportCam, scene);
+
 somTrilhaSonora();
 
 showControlsInfoBox();
-makeAnimationFrameRequest();
+
+loadAssetsAndStart();

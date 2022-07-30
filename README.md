@@ -20,3 +20,6 @@ Files for the Computer Graphics course in Three.js
     - [ ] Tela de carregamento
     - [ ] Comportamento
     - [ ] Joystick
+
+# Link do pages
+https://gabrielsanmarques.github.io/Trabalho1_CG/

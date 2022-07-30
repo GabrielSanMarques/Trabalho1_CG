@@ -164,7 +164,7 @@ const checkCollision = () => {
 };
 
 const shot = async (timeStep) => {
-  if (canShot || timeStep - lastShotTime > 1000) {
+  if (canShot || timeStep - lastShotTime > 500) {
     somTiroPrincipal();
     shots.push(await createShot(plane, scene));
 

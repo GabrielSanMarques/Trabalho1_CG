@@ -16,27 +16,22 @@ import { createDirectionalLight } from "./directionalLight.js";
 import { createHeart } from "./hearts.js";
 
 import { initCamera, InfoBox } from "../libs/util/util.js";
-import {
-  somTrilhaSonora,
-  somTiroAdversario,
-  somColisao,
-  somTiroPrincipal,
-} from "./sound.js";
+import { somRestart, somColisao, somTiroPrincipal } from "./sound.js";
 
 import { Buttons } from "../libs/other/buttons.js";
 var buttons = new Buttons(onButtonDown);
+import { GLTFLoader } from "../build/jsm/loaders/GLTFLoader.js";
+import { LoadingManager } from "../build/three.module.js";
 
 const clock = new THREE.Clock();
 const keyboard = new KeyboardState();
-const scene = new THREE.Scene();
+var scene = new THREE.Scene();
 //scene.background = new THREE.Color(0xffffff);
 const renderer = createRenderer();
 
 const camera = initCamera(new THREE.Vector3(0, 0, 0));
 const viewportCam = new THREE.PerspectiveCamera(50, 48 / 7.8, 1, 500);
 //const stats = createFpsStatsPanel(); // To show FPS information //
-
-const plane = await createAirplane(scene);
 
 const ground = createGround(scene);
 
@@ -105,9 +100,11 @@ const updateShots = () => {
   });
 };
 
-const restartGame = (timeout) =>
-  setTimeout(() => window.location.reload(), timeout ?? 1000);
-
+const restartGame = (timeout) => {
+  scene = scene2;
+  somRestart();
+  setTimeout(() => window.location.reload(), timeout ?? 4000);
+};
 const decreseLife = (pts) => {
   if (collisionEnabled) {
     if (plane.life > 0) {
@@ -168,29 +165,29 @@ const screenLowerLimitZ = 35;
 
 //const disablePlaneCollision = () => (collisionEnabled = false);
 
-// const keyboardHandler = () => {
-//   const dt = clock.getDelta();
+const keyboardHandler = () => {
+  const dt = clock.getDelta();
 
-//   keyboard.update();
-//   plane.equilibrio(dt);
-//   if (keyboard.pressed("right")) plane.moveRight(dt);
-//   if (keyboard.pressed("left")) plane.moveLeft(dt);
-//   if (keyboard.pressed("up") && plane.positionZ() >= screenUpperLimitZ)
-//     plane.moveForward(dt);
-//   if (keyboard.pressed("down") && plane.positionZ() <= screenLowerLimitZ)
-//     plane.moveBackward(dt);
-//   if (keyboard.down("ctrl")) {
-//     shot(); // Missil Aereo
-//     somTiroPrincipal();
-//   }
-//   if (keyboard.down("space")) {
-//     bombShot(); //Misseis ar-terra
-//     somTiroPrincipal();
-//     console.log(dt);
-//   }
-//   if (keyboard.pressed("G")) disablePlaneCollision(); // Evitar Colisão
-//   if (keyboard.pressed("enter")) restartGame(); //Retornar ao Inicio
-// };
+  keyboard.update();
+  plane.equilibrio(dt);
+  if (keyboard.pressed("right")) plane.moveRight(dt);
+  if (keyboard.pressed("left")) plane.moveLeft(dt);
+  if (keyboard.pressed("up") && plane.positionZ() >= screenUpperLimitZ)
+    plane.moveForward(dt);
+  if (keyboard.pressed("down") && plane.positionZ() <= screenLowerLimitZ)
+    plane.moveBackward(dt);
+  if (keyboard.down("ctrl")) {
+    shot(); // Missil Aereo
+    somTiroPrincipal();
+  }
+  if (keyboard.down("space")) {
+    bombShot(); //Misseis ar-terra
+    somTiroPrincipal();
+    console.log(dt);
+  }
+  if (keyboard.pressed("G")) disablePlaneCollision(); // Evitar Colisão
+  if (keyboard.pressed("enter")) restartGame(); //Retornar ao Inicio
+};
 
 // window.addEventListener("keydown", (e) => {
 //   if (e.key == "p") {
@@ -219,7 +216,7 @@ function dualRender() {
   renderer.setViewport(0, 0, width, height); // Reset viewport
   renderer.setScissorTest(false); // Disable scissor to paint the entire window
   //renderer.setClearAlpha(0);
-  renderer.setClearColor("rgb(0,70,170)");
+  //renderer.setClearColor("rgb(0,70,170)");
   renderer.clear(); // Clean the window
   renderer.render(scene, camera);
 
@@ -239,7 +236,7 @@ const update = () => {
   updateEnemyShots();
   updateEnemies();
   checkCollision();
-  //keyboardHandler();
+  keyboardHandler();
   moveGround(ground);
   //stats.update();
   updatePlane();
@@ -325,36 +322,39 @@ function onButtonDown(event) {
   }
 }
 
-// const loadingManager = new THREE.LoadingManager(() => {
-//   let loadingScreen = document.getElementById("loading-screen");
-//   loadingScreen.transition = 0;
-//   loadingScreen.style.setProperty("--speed1", "0");
-//   loadingScreen.style.setProperty("--speed2", "0");
-//   loadingScreen.style.setProperty("--speed3", "0");
+const plane = await createAirplane(scene);
 
-//   let button = document.getElementById("myBtn");
-//   button.style.backgroundColor = "Red";
-//   button.innerHTML = "Click to Enter";
-//   button.addEventListener("click", onButtonPressed);
-// });
+const loadingManager = new THREE.LoadingManager(() => {
+  let loadingScreen = document.getElementById("loading-screen");
+  loadingScreen.transition = 0;
+  loadingScreen.style.setProperty("--speed1", "0");
+  loadingScreen.style.setProperty("--speed2", "0");
+  loadingScreen.style.setProperty("--speed3", "0");
 
-// // loadAudio(loadingManager, "../assets/megalovania.mp3");
-// // function loadAudio(manager, audio) {
-// //   // Create ambient sound
-// //   audioLoader = new THREE.AudioLoader(manager);
-// //   audioPath = audio;
-// // }
+  let button = document.getElementById("myBtn");
+  button.style.backgroundColor = "Red";
+  button.innerHTML = "Start";
+  button.addEventListener("click", onButtonPressed);
+});
 
-// function onButtonPressed() {
-//   const loadingScreen = document.getElementById("loading-screen");
-//   loadingScreen.transition = 0;
-//   loadingScreen.classList.add("fade-out");
-//   loadingScreen.addEventListener("transitionend", (e) => {
-//     const element = e.target;
-//     element.remove();
-//   });
-// }
+loadGLTFObject(loadingManager, "../assets/scene.gltf");
+function loadGLTFObject(manager, object) {
+  var loader = new GLTFLoader(manager);
+  loader.load(object, function (gltf) {}, null, null);
+}
+
+function onButtonPressed() {
+  const loadingScreen = document.getElementById("loading-screen");
+  loadingScreen.transition = 0;
+  loadingScreen.classList.add("fade-out");
+  loadingScreen.addEventListener("transitionend", (e) => {
+    const element = e.target;
+    element.remove();
+  });
+}
+
+var scene2 = new THREE.Scene();
+scene2.background = new THREE.Color(0x000000);
 
 //somTrilhaSonora();
-//showControlsInfoBox();
 makeAnimationFrameRequest();

@@ -42,21 +42,21 @@ export const createAirplane = async (scene) => {
       plane.translateZ1(-dt * planeSpeed);
       if (obj.rotation.y <= -0.75) obj.rotateX(3 * dt);
       if (obj.rotation.y > -0.75) obj.rotation.y = -0.75;
-      console.log(obj.rotation.y);
+      //console.log(obj.rotation.y);
     },
     moveRight: (dt) => {
       direcao = false;
       plane.translateZ1(dt * planeSpeed);
       if (obj.rotation.y <= -0.75) obj.rotateX(-3 * dt);
       if (obj.rotation.y > -0.75) obj.rotation.y = -0.75;
-      console.log(obj.rotation.y);
+      //console.log(obj.rotation.y);
     },
     equilibrio: (dt) => {
       if (obj.rotation.y > -1.45) {
         if (direcao) obj.rotateX(-1.5 * dt);
         else obj.rotateX(1.5 * dt);
       } else obj.rotation.y = -1.55;
-      console.log(obj.rotation.y);
+      //console.log(obj.rotation.y);
     },
   });
 };

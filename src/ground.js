@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import { loadTexture } from "./texture.js";
+import { ROOT_PATH } from "/Trabalho1_CG/constants.js";
 
 ////////////////////
 //// Constantes ////
@@ -29,7 +30,7 @@ const createGround = (scene) => {
   planeGeometry.translate(0.0, 0.0, -0.02); // To avoid conflict with the axeshelper
 
   const planeMaterial = new THREE.MeshPhongMaterial({
-    map: loadTexture("../assets/sand.jpg"),
+    map: loadTexture(`${ROOT_PATH}/assets/sand.jpg`),
   });
 
   const ground = new THREE.Mesh(planeGeometry, planeMaterial);

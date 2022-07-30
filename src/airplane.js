@@ -14,7 +14,7 @@ let _modelObj = null;
 const getObject = async () => {
   if (_modelObj == null) {
     _modelObj = await loadGLTFFile(
-      "../assets/objects/",
+      "/assets/objects/",
       "airplane",
       4.0,
       180,

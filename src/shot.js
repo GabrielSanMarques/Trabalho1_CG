@@ -15,7 +15,7 @@ export const getObject = async () => {
 
 export const loadShotImage = async () => {
   if (_modelObj == null) {
-    _modelObj = await loadGLTFFile("../assets/objects/", "missile", 4.0, true);
+    _modelObj = await loadGLTFFile("/assets/objects/", "missile", 4.0, true);
   }
 };
 

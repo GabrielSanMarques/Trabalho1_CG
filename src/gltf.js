@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import { GLTFLoader } from "../build/jsm/loaders/GLTFLoader.js";
 import { getMaxSize } from "../libs/util/util.js";
+import { ROOT_PATH } from "/Trabalho1_CG/constants.js";
 
 const loader = new GLTFLoader();
 
@@ -22,7 +23,7 @@ export const loadGLTFFile = (
   visible = true
 ) =>
   new Promise((resolve) => {
-    loader.load(modelPath + modelFolder + "/scene.gltf", (gltf) => {
+    loader.load(ROOT_PATH + modelPath + modelFolder + "/scene.gltf", (gltf) => {
       let obj = gltf.scene;
 
       obj.visible = visible;

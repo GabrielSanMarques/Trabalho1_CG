@@ -3,7 +3,7 @@ Files for the Computer Graphics course in Three.js
 
 # TODO
 - [ ] Textura e ambiente (18 pontos)
-    - [ ] Vale - implementação do rio
+    - [x] Vale - implementação do rio
     - [ ] Vale - implementação das laterais
     - [ ] Assets com textura
     - [ ] Explosões

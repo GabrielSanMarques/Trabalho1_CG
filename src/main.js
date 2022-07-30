@@ -14,14 +14,24 @@ import { createCameraHolder, createViewportHolder } from "./cameraHolder.js";
 import { createGround, moveGround } from "./ground.js";
 import { createDirectionalLight } from "./directionalLight.js";
 import { createHeart } from "./hearts.js";
+import { createWater } from "./water.js";
 
 import { initCamera, InfoBox } from "../libs/util/util.js";
 import {
   somTrilhaSonora,
-  somTiroAdversario,
+  // somTiroAdversario,
   somColisao,
   somTiroPrincipal,
 } from "./sound.js";
+
+////////////////////
+//// Constantes ////
+////////////////////
+
+const SCREEN_UPPER_LIMIT_Z = -35;
+const SCREEN_LOWER_LIMIT_Z = 35;
+
+const SHOT_CADENCE_DT = 500;
 
 ///////////////////
 //// Variáveis ////
@@ -41,9 +51,6 @@ const plane = await createAirplane(scene);
 const ground = createGround(scene);
 
 const hearts = createHeart(scene);
-
-const screenUpperLimitZ = -35;
-const screenLowerLimitZ = 35;
 
 let enemies = [];
 let shots = [];
@@ -164,7 +171,7 @@ const checkCollision = () => {
 };
 
 const shot = async (timeStep) => {
-  if (canShot || timeStep - lastShotTime > 500) {
+  if (canShot || timeStep - lastShotTime > SHOT_CADENCE_DT) {
     somTiroPrincipal();
     shots.push(await createShot(plane, scene));
 
@@ -185,9 +192,9 @@ const keyboardHandler = (timeStep) => {
 
   if (keyboard.pressed("right")) plane.moveRight(dt);
   if (keyboard.pressed("left")) plane.moveLeft(dt);
-  if (keyboard.pressed("up") && plane.positionZ() >= screenUpperLimitZ)
+  if (keyboard.pressed("up") && plane.positionZ() >= SCREEN_UPPER_LIMIT_Z)
     plane.moveForward(dt);
-  if (keyboard.pressed("down") && plane.positionZ() <= screenLowerLimitZ)
+  if (keyboard.pressed("down") && plane.positionZ() <= SCREEN_LOWER_LIMIT_Z)
     plane.moveBackward(dt);
   if (keyboard.pressed("ctrl")) shot(timeStep); // Missil Aereo
 
@@ -263,6 +270,8 @@ const togglePause = () => {
 const loadAssetsAndStart = async () => {
   await loadShotImage();
 
+  somTrilhaSonora();
+  showControlsInfoBox();
   makeAnimationFrameRequest();
 };
 
@@ -285,14 +294,9 @@ const keyupHandler = (e) => {
 window.addEventListener("keydown", keydownHandler);
 window.addEventListener("keyup", keyupHandler);
 
+createWater(scene);
 createDirectionalLight(scene);
 createCameraHolder(camera, scene);
-
-createCameraHolder(camera, scene);
 createViewportHolder(viewportCam, scene);
-
-somTrilhaSonora();
-
-showControlsInfoBox();
 
 loadAssetsAndStart();

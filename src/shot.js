@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { GameObject } from "./GameObject.js";
-import { loadGLTFFile } from "./glft.js";
+import { loadGLTFFile } from "./gltf.js";
 
 const speed = 2;
 

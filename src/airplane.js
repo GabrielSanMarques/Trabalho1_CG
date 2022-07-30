@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import { degreesToRadians } from "../libs/util/util.js";
 import { GameObject } from "./GameObject.js";
-import { loadGLTFFile } from "./glft.js";
+import { loadGLTFFile } from "./gltf.js";
 
 const planeX = 0;
 const planeY = 2;

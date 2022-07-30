@@ -23,6 +23,10 @@ import {
   somTiroPrincipal,
 } from "./sound.js";
 
+///////////////////
+//// Variáveis ////
+///////////////////
+
 const clock = new THREE.Clock();
 const keyboard = new KeyboardState();
 const scene = new THREE.Scene();
@@ -38,8 +42,8 @@ const ground = createGround(scene);
 
 const hearts = createHeart(scene);
 
-createDirectionalLight(scene);
-createCameraHolder(camera, scene);
+const screenUpperLimitZ = -35;
+const screenLowerLimitZ = 35;
 
 let enemies = [];
 let shots = [];
@@ -47,10 +51,14 @@ let enemyShots = [];
 
 let collisionEnabled = true;
 
-createCameraHolder(camera, scene);
-createViewportHolder(viewportCam, scene);
+let animationFrameRequest = undefined;
 
-await loadShotImage();
+let canShot = true;
+let lastShotTime = -3000;
+
+/////////////////
+//// Funções ////
+/////////////////
 
 const updateEnemies = () => {
   enemies = enemies.filter((enemy) => {
@@ -155,9 +163,6 @@ const checkCollision = () => {
   });
 };
 
-let canShot = true;
-let lastShotTime = -3000;
-
 const shot = async (timeStep) => {
   if (canShot || timeStep - lastShotTime > 1000) {
     somTiroPrincipal();
@@ -169,9 +174,6 @@ const shot = async (timeStep) => {
 };
 
 const bombShot = () => shots.push(new Bomb(plane, scene));
-
-const screenUpperLimitZ = -35;
-const screenLowerLimitZ = 35;
 
 const disablePlaneCollision = () => (collisionEnabled = false);
 
@@ -196,18 +198,6 @@ const keyboardHandler = (timeStep) => {
   if (keyboard.pressed("G")) disablePlaneCollision(); // Evitar Colisão
   if (keyboard.pressed("enter")) restartGame(); //Retornar ao Inicio
 };
-
-window.addEventListener("keydown", (e) => {
-  if (e.key == "p") {
-    togglePause();
-  }
-});
-
-window.addEventListener("keyup", (e) => {
-  if (e.key == "Control") {
-    canShot = true;
-  }
-});
 
 const showControlsInfoBox = () => {
   const controls = new InfoBox();
@@ -252,8 +242,6 @@ const update = (timeStep) => {
   stats.update();
 };
 
-let animationFrameRequest = undefined;
-
 const makeAnimationFrameRequest = () => {
   animationFrameRequest = requestAnimationFrame((timeStep) => {
     makeAnimationFrameRequest();
@@ -272,7 +260,39 @@ const togglePause = () => {
   }
 };
 
+const loadAssetsAndStart = async () => {
+  await loadShotImage();
+
+  makeAnimationFrameRequest();
+};
+
+const keydownHandler = (e) => {
+  if (e.key == "p") {
+    togglePause();
+  }
+};
+
+const keyupHandler = (e) => {
+  if (e.key == "Control") {
+    canShot = true;
+  }
+};
+
+///////////////////////
+//// Inicialização ////
+///////////////////////
+
+window.addEventListener("keydown", keydownHandler);
+window.addEventListener("keyup", keyupHandler);
+
+createDirectionalLight(scene);
+createCameraHolder(camera, scene);
+
+createCameraHolder(camera, scene);
+createViewportHolder(viewportCam, scene);
+
 somTrilhaSonora();
 
 showControlsInfoBox();
-makeAnimationFrameRequest();
+
+loadAssetsAndStart();

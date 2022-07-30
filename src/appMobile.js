@@ -20,8 +20,7 @@ import { somRestart, somColisao, somTiroPrincipal } from "./sound.js";
 
 import { Buttons } from "../libs/other/buttons.js";
 var buttons = new Buttons(onButtonDown);
-import { GLTFLoader } from "../build/jsm/loaders/GLTFLoader.js";
-import { LoadingManager } from "../build/three.module.js";
+import { ColladaLoader } from "../build/jsm/loaders/ColladaLoader.js";
 
 const clock = new THREE.Clock();
 const keyboard = new KeyboardState();
@@ -216,7 +215,7 @@ function dualRender() {
   renderer.setViewport(0, 0, width, height); // Reset viewport
   renderer.setScissorTest(false); // Disable scissor to paint the entire window
   //renderer.setClearAlpha(0);
-  //renderer.setClearColor("rgb(0,70,170)");
+  renderer.setClearColor("rgb(60, 60, 80)");
   renderer.clear(); // Clean the window
   renderer.render(scene, camera);
 
@@ -337,10 +336,17 @@ const loadingManager = new THREE.LoadingManager(() => {
   button.addEventListener("click", onButtonPressed);
 });
 
-loadGLTFObject(loadingManager, "../assets/scene.gltf");
-function loadGLTFObject(manager, object) {
-  var loader = new GLTFLoader(manager);
-  loader.load(object, function (gltf) {}, null, null);
+loadColladaObject(loadingManager, " ../assets/stormtrooper/stormtrooper.dae");
+let mixer = 0;
+function loadColladaObject(manager, object) {
+  const loader = new ColladaLoader(manager);
+  loader.load(object, (collada) => {
+    const avatar = collada.scene;
+    const animations = avatar.animations;
+    mixer = new THREE.AnimationMixer(avatar);
+    mixer.clipAction(animations[0]).play();
+    scene2.add(avatar);
+  });
 }
 
 function onButtonPressed() {
@@ -354,7 +360,7 @@ function onButtonPressed() {
 }
 
 var scene2 = new THREE.Scene();
-scene2.background = new THREE.Color(0x000000);
+scene2.background = new THREE.Color("rgb(60, 60, 80)");
 
 //somTrilhaSonora();
 makeAnimationFrameRequest();

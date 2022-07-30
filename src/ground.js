@@ -1,36 +1,53 @@
 import * as THREE from "three";
-import { createGroundPlaneWired } from "../libs/util/util.js";
+import { loadTexture } from "./texture.js";
+
+////////////////////
+//// Constantes ////
+////////////////////
+
+const GROUND_WIDTH = 250;
+const GROUND_HEIGHT = 250;
+const GROUND_SPEED = -15;
+
+const GROUND_Y = -8;
+
+const SCREEN_LIMIT = 10;
+
+///////////////////
+//// Variáveis ////
+///////////////////
 
 const clock = new THREE.Clock();
-const width = 250;
-const height = 200;
-const widthSegments = 250 / 2;
-const heightSegments = 200 / 2;
-const speed = -15;
-const screenLimit = 10;
+
+/////////////////
+//// Funções ////
+/////////////////
+const _setGroundInitialPos = (ground) => ground.position.set(0, GROUND_Y, 0);
 
 const createGround = (scene) => {
-  const ground = createGroundPlaneWired(
-    width,
-    height,
-    widthSegments,
-    heightSegments
-  );
+  const planeGeometry = new THREE.PlaneGeometry(GROUND_WIDTH, GROUND_HEIGHT);
+  planeGeometry.translate(0.0, 0.0, -0.02); // To avoid conflict with the axeshelper
+
+  const planeMaterial = new THREE.MeshPhongMaterial({
+    map: loadTexture("../assets/sand.jpg"),
+  });
+
+  const ground = new THREE.Mesh(planeGeometry, planeMaterial);
+
+  ground.receiveShadow = true;
+  ground.rotateX(-Math.PI / 2);
 
   if (scene) {
     scene.add(ground);
   }
-
-  ground.position.set(0, -8, 0);
-  ground.receiveShadow = true;
-
+  _setGroundInitialPos(ground);
   return ground;
 };
 
 const moveGround = (ground) => {
-  var moveDistance = speed * clock.getDelta();
+  var moveDistance = GROUND_SPEED * clock.getDelta();
   ground.translateY(moveDistance);
-  if (ground.position.z >= screenLimit) ground.position.set(0, -8, 0);
+  if (ground.position.z >= SCREEN_LIMIT) _setGroundInitialPos(ground);
 };
 
-export { createGround, moveGround };
+export { GROUND_WIDTH, GROUND_HEIGHT, GROUND_Y, createGround, moveGround };

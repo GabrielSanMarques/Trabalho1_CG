@@ -1,25 +1,24 @@
 import * as THREE from "three";
 import { Water } from "../build/jsm/objects/Water2.js";
+import { GROUND_WIDTH, GROUND_HEIGHT, GROUND_Y } from "./ground.js";
 
-const params = {
-  color: "#ffffff",
-  scale: 4,
-  flowX: 1,
-  flowY: 1,
-};
+const WATER_COLOR = "#ffffff";
+const WATER_SCALE = 4;
+const WATER_FLOW_X = 1;
+const WATER_FLOW_Y = 1;
 
 export const createWater = (scene) => {
-  const waterGeometry = new THREE.PlaneGeometry(500, 500);
+  const waterGeometry = new THREE.PlaneGeometry(GROUND_WIDTH, GROUND_HEIGHT);
 
   const water = new Water(waterGeometry, {
-    color: params.color,
-    scale: params.scale,
-    flowDirection: new THREE.Vector2(params.flowX, params.flowY),
+    color: WATER_COLOR,
+    scale: WATER_SCALE,
+    flowDirection: new THREE.Vector2(WATER_FLOW_X, WATER_FLOW_Y),
     textureWidth: 1024,
     textureHeight: 1024,
   });
 
-  water.position.y = -1;
+  water.position.y = GROUND_Y + 2;
   water.rotation.x = Math.PI * -0.5;
   scene.add(water);
 

@@ -300,8 +300,6 @@ createDirectionalLight(scene);
 createCameraHolder(camera, scene);
 createViewportHolder(viewportCam, scene);
 
-loadAssetsAndStart();
-
 /////////////////////////////////////
 /// Loading Screen e Stormtrooper ///
 /////////////////////////////////////
@@ -339,6 +337,7 @@ function onButtonPressed() {
   loadingScreen.addEventListener("transitionend", (e) => {
     const element = e.target;
     element.remove();
+    loadAssetsAndStart();
   });
 }
 

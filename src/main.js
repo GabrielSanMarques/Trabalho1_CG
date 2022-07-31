@@ -23,7 +23,9 @@ import {
   // somTiroAdversario,
   somColisao,
   somTiroPrincipal,
+  somRestart,
 } from "./sound.js";
+import { ColladaLoader } from "../build/jsm/loaders/ColladaLoader.js";
 
 ////////////////////
 //// Constantes ////
@@ -40,7 +42,7 @@ const SHOT_CADENCE_DT = 500;
 
 const clock = new THREE.Clock();
 const keyboard = new KeyboardState();
-const scene = new THREE.Scene();
+var scene = new THREE.Scene();
 const renderer = createRenderer();
 
 const camera = initCamera(new THREE.Vector3(0, 0, 0));
@@ -116,9 +118,6 @@ const updateShots = () => {
     return keepShot;
   });
 };
-
-const restartGame = (timeout) =>
-  setTimeout(() => window.location.reload(), timeout ?? 1000);
 
 const decreseLife = (pts) => {
   if (collisionEnabled) {
@@ -301,4 +300,52 @@ createDirectionalLight(scene);
 createCameraHolder(camera, scene);
 createViewportHolder(viewportCam, scene);
 
-loadAssetsAndStart();
+/////////////////////////////////////
+/// Loading Screen e Stormtrooper ///
+/////////////////////////////////////
+
+const loadingManager = new THREE.LoadingManager(() => {
+  let loadingScreen = document.getElementById("loading-screen");
+  loadingScreen.transition = 0;
+  loadingScreen.style.setProperty("--speed1", "0");
+  loadingScreen.style.setProperty("--speed2", "0");
+  loadingScreen.style.setProperty("--speed3", "0");
+
+  let button = document.getElementById("myBtn");
+  button.style.backgroundColor = "Red";
+  button.innerHTML = "Start";
+  button.addEventListener("click", onButtonPressed);
+});
+
+loadColladaObject(loadingManager, " ../assets/stormtrooper/stormtrooper.dae");
+let mixer = 0;
+function loadColladaObject(manager, object) {
+  const loader = new ColladaLoader(manager);
+  loader.load(object, (collada) => {
+    const avatar = collada.scene;
+    const animations = avatar.animations;
+    mixer = new THREE.AnimationMixer(avatar);
+    mixer.clipAction(animations[0]).play();
+    scene2.add(avatar);
+  });
+}
+
+function onButtonPressed() {
+  const loadingScreen = document.getElementById("loading-screen");
+  loadingScreen.transition = 0;
+  loadingScreen.classList.add("fade-out");
+  loadingScreen.addEventListener("transitionend", (e) => {
+    const element = e.target;
+    element.remove();
+    loadAssetsAndStart();
+  });
+}
+
+const restartGame = (timeout) => {
+  scene = scene2;
+  somRestart();
+  setTimeout(() => window.location.reload(), timeout ?? 4000);
+};
+
+var scene2 = new THREE.Scene();
+scene2.background = new THREE.Color("rgb(60, 60, 80)");

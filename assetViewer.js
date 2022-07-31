@@ -52,8 +52,12 @@ var infoBox = new SecondaryBox("");
 var objectArray = new Array();
 var activeObject = 0; // View first object
 
-loadGLTFFile('assets/objects/', 'airplane', 2.0, 180, false);
+loadGLTFFile('assets/objects/', 'airplane', 2.0, 180, true);
 loadGLTFFile('assets/objects/', 'missile', 2.0, 90, false);
+loadGLTFFile('assets/objects/', 'enemy-plane', 10.0, 90, false);
+loadGLTFFile('assets/objects/', 'ground_enemy', 2.0, 90, false);
+loadGLTFFile('assets/objects/', 'helicopter', 4.0, 90, false);
+loadGLTFFile('assets/objects/', 'side-enemy', 4.0, 90, false);
 
 buildInterface();
 render();

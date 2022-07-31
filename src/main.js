@@ -27,6 +27,7 @@ import {
   somColisao,
   somTiroPrincipal,
   somRestart,
+  somTiroAdversario,
 } from "./sound.js";
 import { ColladaLoader } from "../build/jsm/loaders/ColladaLoader.js";
 
@@ -36,6 +37,8 @@ import { ColladaLoader } from "../build/jsm/loaders/ColladaLoader.js";
 
 const SCREEN_UPPER_LIMIT_Z = -35;
 const SCREEN_LOWER_LIMIT_Z = 35;
+const SCREEN_LEFT_LIMIT_X = -35;
+const SCREEN_RIGHT_LIMIT_X = 35;
 
 const SHOT_CADENCE_DT = 500;
 
@@ -397,6 +400,7 @@ const enemyShot = () => {
       enemyShots.push(new GroundEnemyShot(enemy, scene, plane));
     else enemyShots.push(new AirEnemyShot(enemy, scene, plane));
   });
+  somTiroAdversario();
 };
 
 const updateEnemies = () => {
@@ -493,6 +497,7 @@ const checkCollision = () => {
     if (shot.collidesWith(plane)) {
       shot.removeFromScene();
       decreseLife(1);
+      somColisao();
       keep = false;
     }
     return keep;
@@ -519,14 +524,18 @@ const keyboardHandler = (timeStep) => {
   keyboard.update();
   plane.equilibrio(dt);
 
-  if (keyboard.pressed("right")) plane.moveRight(dt);
-  if (keyboard.pressed("left")) plane.moveLeft(dt);
+  if (keyboard.pressed("right") && plane.positionX() <= SCREEN_RIGHT_LIMIT_X)
+    plane.moveRight(dt);
+  if (keyboard.pressed("left") && plane.positionX() >= SCREEN_LEFT_LIMIT_X)
+    plane.moveLeft(dt);
   if (keyboard.pressed("up") && plane.positionZ() >= SCREEN_UPPER_LIMIT_Z)
     plane.moveForward(dt);
   if (keyboard.pressed("down") && plane.positionZ() <= SCREEN_LOWER_LIMIT_Z)
     plane.moveBackward(dt);
-  if (keyboard.pressed("ctrl")) shot(timeStep); // Missil Aereo
-
+  if (keyboard.pressed("ctrl")) {
+    shot(timeStep); // Missil Aereo
+    somTiroPrincipal();
+  }
   if (keyboard.down("space")) {
     bombShot(); //Misseis ar-terra
     somTiroPrincipal();

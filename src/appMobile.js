@@ -161,32 +161,32 @@ const bombShot = () => shots.push(new Bomb(plane, scene));
 
 const screenUpperLimitZ = -35;
 const screenLowerLimitZ = 35;
+const screenLeftLimitX = -35;
+const screeRightLimitX = 35;
 
-//const disablePlaneCollision = () => (collisionEnabled = false);
+// const keyboardHandler = () => {
+//   const dt = clock.getDelta();
 
-const keyboardHandler = () => {
-  const dt = clock.getDelta();
-
-  keyboard.update();
-  plane.equilibrio(dt);
-  if (keyboard.pressed("right")) plane.moveRight(dt);
-  if (keyboard.pressed("left")) plane.moveLeft(dt);
-  if (keyboard.pressed("up") && plane.positionZ() >= screenUpperLimitZ)
-    plane.moveForward(dt);
-  if (keyboard.pressed("down") && plane.positionZ() <= screenLowerLimitZ)
-    plane.moveBackward(dt);
-  if (keyboard.down("ctrl")) {
-    shot(); // Missil Aereo
-    somTiroPrincipal();
-  }
-  if (keyboard.down("space")) {
-    bombShot(); //Misseis ar-terra
-    somTiroPrincipal();
-    console.log(dt);
-  }
-  if (keyboard.pressed("G")) disablePlaneCollision(); // Evitar Colisão
-  if (keyboard.pressed("enter")) restartGame(); //Retornar ao Inicio
-};
+//   keyboard.update();
+//   plane.equilibrio(dt);
+//   if (keyboard.pressed("right")) plane.moveRight(dt);
+//   if (keyboard.pressed("left")) plane.moveLeft(dt);
+//   if (keyboard.pressed("up") && plane.positionZ() >= screenUpperLimitZ)
+//     plane.moveForward(dt);
+//   if (keyboard.pressed("down") && plane.positionZ() <= screenLowerLimitZ)
+//     plane.moveBackward(dt);
+//   if (keyboard.down("ctrl")) {
+//     shot(); // Missil Aereo
+//     somTiroPrincipal();
+//   }
+//   if (keyboard.down("space")) {
+//     bombShot(); //Misseis ar-terra
+//     somTiroPrincipal();
+//     console.log(dt);
+//   }
+//   if (keyboard.pressed("G")) disablePlaneCollision(); // Evitar Colisão
+//   if (keyboard.pressed("enter")) restartGame(); //Retornar ao Inicio
+// };
 
 // window.addEventListener("keydown", (e) => {
 //   if (e.key == "p") {
@@ -277,10 +277,10 @@ function updatePlane() {
   if (bkdValue && plane.positionZ() <= screenLowerLimitZ) {
     plane.moveBackward(0.035 * bkdValue);
   }
-  if (lftValue) {
+  if (lftValue && plane.positionX() >= screenLeftLimitX) {
     plane.moveLeft(0.035 * lftValue);
   }
-  if (rgtValue) {
+  if (rgtValue && plane.positionX() <= screeRightLimitX) {
     plane.moveRight(0.035 * rgtValue);
   }
   plane.equilibrio(dt);
@@ -317,6 +317,7 @@ function onButtonDown(event) {
       break;
     case "Space":
       bombShot();
+      restartGame();
       break;
   }
 }

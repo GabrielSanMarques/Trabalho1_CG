@@ -8,6 +8,7 @@ const trombone = new Audio(`${ROOT_PATH}/assets/audio/fortnite.mp3`);
 
 const somTrilhaSonora = () => {
   trilhaSonora.load();
+  trilhaSonora.volume = 0.2;
   trilhaSonora.play();
 };
 
@@ -18,6 +19,7 @@ const somTiroAdversario = () => {
 
 const somTiroPrincipal = () => {
   tiroPrincipal.load();
+  tiroPrincipal.volume = 0.3;
   tiroPrincipal.play();
 };
 
@@ -30,6 +32,7 @@ const somRestart = () => {
   trombone.load();
   trombone.play();
 };
+
 export {
   somTrilhaSonora,
   somTiroAdversario,

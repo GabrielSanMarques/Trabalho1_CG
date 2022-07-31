@@ -967,3 +967,10 @@ function computeNormalsGroup(group) {
         group.children.forEach(function(child) {computeNormalsGroup(child)});
     }
 }
+
+/**
+ * Extract filename from a fullpath
+ */
+ export function getFilename(fullPath) {
+  return fullPath.replace(/^.*[\\\/]/, '');
+}

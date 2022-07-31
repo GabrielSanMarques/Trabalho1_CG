@@ -1,7 +1,7 @@
 import * as THREE from "three";
 
 const color = 0xffffff;
-const intensity = 1;
+const intensity = 1.5;
 const lightX = 30;
 const lightY = 30;
 const lightZ = 35;

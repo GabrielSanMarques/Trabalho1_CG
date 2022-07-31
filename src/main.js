@@ -51,7 +51,7 @@ const stats = createFpsStatsPanel();
 
 const plane = await createAirplane(scene);
 
-const ground = createGround(scene);
+//const ground = createGround(scene);
 
 const hearts = createHeart(scene);
 
@@ -245,7 +245,7 @@ const update = (timeStep) => {
   updateEnemies();
   checkCollision();
   keyboardHandler(timeStep);
-  moveGround(ground);
+  //moveGround(ground);
   stats.update();
 };
 

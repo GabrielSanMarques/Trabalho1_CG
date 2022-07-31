@@ -9,7 +9,7 @@ export const createValley = (scene) => {
     const normalMap = loadTexture("assets/textures/valley/normal_map.jpg");
     const roughMap = loadTexture("assets/textures/valley/roughness_map.png")
 
-    const valleyGeometry = new THREE.PlaneBufferGeometry(GROUND_WIDTH / 1.55, GROUND_HEIGHT / 2, 300, 300);
+    const valleyGeometry = new THREE.PlaneBufferGeometry(GROUND_WIDTH / 1.6, GROUND_HEIGHT / 1.8, 300, 300);
     const valley = new THREE.Mesh(valleyGeometry,
         new THREE.MeshStandardMaterial({
             color: '#fff',
@@ -20,6 +20,7 @@ export const createValley = (scene) => {
             normalMap: normalMap,
             wireframe: false,
         }));
+    valley.castShadow = true;
     valley.receiveShadow = true;
 
 

@@ -2,10 +2,10 @@ import * as THREE from "three";
 import { Water } from "../build/jsm/objects/Water2.js";
 import { GROUND_WIDTH, GROUND_HEIGHT, GROUND_Y } from "./ground.js";
 
-const WATER_COLOR = "blue";
+const WATER_COLOR = "rgb(0, 50, 255)";
 const WATER_SCALE = 4;
-const WATER_FLOW_X = 1;
-const WATER_FLOW_Y = 1;
+const WATER_FLOW_X = 0;
+const WATER_FLOW_Y = 5;
 
 export const createWater = (scene) => {
   const waterGeometry = new THREE.PlaneGeometry(GROUND_WIDTH, GROUND_HEIGHT);

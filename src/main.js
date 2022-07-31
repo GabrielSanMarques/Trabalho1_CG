@@ -62,13 +62,324 @@ let enemyShots = [];
 let collisionEnabled = true;
 
 let animationFrameRequest = undefined;
+let savedTimeStep = 0;
 
 let canShot = true;
-let lastShotTime = -3000;
+let lastShotTime = -SHOT_CADENCE_DT;
+
+let sideDirection;
+
+let waveIdx = 0;
+let initialTime = -1;
+
+const waves = [
+  (elapsedTime) => {
+    if (elapsedTime >= 1000) {
+      sideDirection = 1;
+      for (var i = 0; i < 5; i++) {
+        enemies.push(new Enemy(scene, -30 + 15 * i, 0.4, plane));
+      }
+      waveIdx++;
+    }
+  },
+
+  (elapsedTime) => {
+    if (elapsedTime >= 6000) {
+      for (var i = 0; i < 6; i++) {
+        enemies.push(new SideEnemy(scene, -25 + 10 * i, 0.7, sideDirection));
+        sideDirection *= -1;
+      }
+      waveIdx++;
+    }
+  },
+
+  (elapsedTime) => {
+    if (elapsedTime >= 11000) {
+      for (var i = 0; i < 6; i++) {
+        sideDirection = 1;
+        enemies.push(new ArcEnemy(scene, 10 + 8 * i, 0.5, sideDirection));
+        sideDirection *= -1;
+      }
+      waveIdx++;
+    }
+  },
+
+  (elapsedTime) => {
+    if (elapsedTime >= 16000) {
+      for (var i = 0; i < 6; i++)
+        enemies.push(new GroundEnemy(scene, -40 + 16 * i, -60, plane));
+    }
+    waveIdx++;
+  },
+
+  (elapsedTime) => {
+    if (elapsedTime >= 21000) {
+      for (var i = 0; i < 5; i++) {
+        enemies.push(new Enemy(scene, -30 + 15 * i, 0.4, plane));
+      }
+      waveIdx++;
+    }
+  },
+
+  (elapsedTime) => {
+    if (elapsedTime >= 23000) {
+      for (var i = 0; i < 5; i++) {
+        enemies.push(new Enemy(scene, -30 + 15 * i, 0.4, plane));
+      }
+      waveIdx++;
+    }
+  },
+  (elapsedTime) => {
+    if (elapsedTime >= 24000) {
+      for (var i = 0; i < 5; i++) {
+        enemies.push(new Enemy(scene, -30 + 15 * i, 0.4, plane));
+      }
+      waveIdx++;
+    }
+  },
+  (elapsedTime) => {
+    if (elapsedTime >= 30000) {
+      sideDirection = 1;
+      for (var i = 0; i < 6; i++) {
+        enemies.push(new ArcEnemy(scene, 10 + 8 * i, 0.5, sideDirection));
+        sideDirection *= -1;
+      }
+      waveIdx++;
+    }
+  },
+  (elapsedTime) => {
+    if (elapsedTime >= 32000) {
+      sideDirection = 1;
+      for (var i = 0; i < 6; i++) {
+        enemies.push(new SideEnemy(scene, -25 + 10 * i, 0.7, sideDirection));
+        sideDirection *= -1;
+      }
+      waveIdx++;
+    }
+  },
+  (elapsedTime) => {
+    if (elapsedTime >= 37000) {
+      for (var i = 0; i < 6; i++) {
+        enemies.push(new Enemy(scene, -40 + 16 * i, 0.4, plane));
+      }
+      waveIdx++;
+    }
+  },
+  (elapsedTime) => {
+    if (elapsedTime >= 37000) {
+      for (var i = 0; i < 6; i++) {
+        enemies.push(new GroundEnemy(scene, -40 + 16 * i, -60, plane));
+      }
+      waveIdx++;
+    }
+  },
+  (elapsedTime) => {
+    if (elapsedTime >= 39000) {
+      sideDirection = 1;
+      for (var i = 0; i < 6; i++) {
+        enemies.push(new SideEnemy(scene, -25 + 10 * i, 0.7, sideDirection));
+        sideDirection *= -1;
+      }
+      waveIdx++;
+    }
+  },
+  (elapsedTime) => {
+    if (elapsedTime >= 44000) {
+      for (var i = 0; i < 8; i++) {
+        enemies.push(new GroundEnemy(scene, -49 + 14 * i, -60, plane));
+      }
+      waveIdx++;
+    }
+  },
+  (elapsedTime) => {
+    if (elapsedTime >= 44000) {
+      sideDirection = 1;
+      for (var i = 0; i < 6; i++) {
+        enemies.push(new SideEnemy(scene, -25 + 10 * i, 0.7, sideDirection));
+        sideDirection *= -1;
+      }
+      waveIdx++;
+    }
+  },
+  (elapsedTime) => {
+    if (elapsedTime >= 46000) {
+      for (var i = 0; i < 8; i++) {
+        enemies.push(new Enemy(scene, -49 + 14 * i, 0.4, plane));
+      }
+      waveIdx++;
+    }
+  },
+  (_) => {
+    // Do nothing
+    // waveIdx++;
+  },
+];
 
 /////////////////
 //// Funções ////
 /////////////////
+
+const game = (timeStep) => {
+  if (initialTime == -1) {
+    initialTime = timeStep;
+  }
+
+  const waveFn = waves[waveIdx];
+
+  savedTimeStep = timeStep;
+  waveFn(timeStep - initialTime);
+
+  ////Wave 8
+  //setTimeout(() => {
+  //  for (var i = 0; i < 6; i++)
+  //    enemies.push(new GroundEnemy(scene, -35 + 14 * i, -60, plane));
+  //}, 51000);
+
+  //setTimeout(() => {
+  //  for (var i = 0; i < 8; i++)
+  //    enemies.push(new GroundEnemy(scene, -49 + 14 * i, -60, plane));
+  //}, 53000);
+
+  //setTimeout(() => {
+  //  for (var i = 0; i < 10; i++)
+  //    enemies.push(new GroundEnemy(scene, -63 + 14 * i, -60, plane));
+  //}, 55000);
+
+  //sideDirection = 1;
+  //setTimeout(() => {
+  //  for (var i = 0; i < 6; i++) {
+  //    enemies.push(new SideEnemy(scene, -25 + 10 * i, 0.7, sideDirection));
+  //    sideDirection *= -1;
+  //  }
+  //}, 55000);
+
+  ////Wave 9
+  //setTimeout(() => {
+  //  for (var i = 0; i < 8; i++)
+  //    enemies.push(new Enemy(scene, -49 + 14 * i, 0.4, plane));
+  //}, 60000);
+
+  //setTimeout(() => {
+  //  for (var i = 0; i < 8; i++)
+  //    enemies.push(new Enemy(scene, -49 + 14 * i, 0.4, plane));
+  //}, 62000);
+
+  //sideDirection = 1;
+  //setTimeout(() => {
+  //  for (var i = 0; i < 6; i++) {
+  //    enemies.push(new ArcEnemy(scene, 10 + 8 * i, 0.5, sideDirection));
+  //    sideDirection *= -1;
+  //  }
+  //}, 62000);
+
+  //setTimeout(() => {
+  //  for (var i = 0; i < 8; i++)
+  //    enemies.push(new Enemy(scene, -49 + 14 * i, 0.4, plane));
+  //}, 64000);
+
+  ////Wave 10
+  //sideDirection = 1;
+  //setTimeout(() => {
+  //  for (var i = 0; i < 8; i++) {
+  //    enemies.push(new ArcEnemy(scene, 10 + 6 * i, 0.5, sideDirection));
+  //    sideDirection *= -1;
+  //  }
+  //}, 69000);
+
+  //sideDirection = -1;
+  //setTimeout(() => {
+  //  for (var i = 0; i < 8; i++) {
+  //    enemies.push(new ArcEnemy(scene, 5 + 6 * i, 0.5, sideDirection));
+  //    sideDirection *= -1;
+  //  }
+  //}, 72000);
+
+  //sideDirection = 1;
+  //setTimeout(() => {
+  //  for (var i = 0; i < 8; i++) {
+  //    enemies.push(new ArcEnemy(scene, 10 + 6 * i, 0.5, sideDirection));
+  //    sideDirection *= -1;
+  //  }
+  //}, 75000);
+
+  ////Wave 11
+  //setTimeout(() => {
+  //  for (var i = 0; i < 6; i++)
+  //    enemies.push(new GroundEnemy(scene, -35 + 14 * i, -60, plane));
+  //}, 80000);
+
+  //setTimeout(() => {
+  //  for (var i = 0; i < 8; i++)
+  //    enemies.push(new GroundEnemy(scene, -49 + 14 * i, -60, plane));
+  //}, 83000);
+
+  //setTimeout(() => {
+  //  for (var i = 0; i < 10; i++)
+  //    enemies.push(new GroundEnemy(scene, -63 + 14 * i, -60, plane));
+  //}, 86000);
+
+  //setTimeout(() => {
+  //  for (var i = 0; i < 10; i++)
+  //    enemies.push(new GroundEnemy(scene, -63 + 14 * i, -60, plane));
+  //}, 89000);
+
+  //setTimeout(() => {
+  //  for (var i = 0; i < 8; i++)
+  //    enemies.push(new GroundEnemy(scene, -49 + 14 * i, -60, plane));
+  //}, 92000);
+
+  //setTimeout(() => {
+  //  for (var i = 0; i < 6; i++)
+  //    enemies.push(new GroundEnemy(scene, -35 + 14 * i, -60, plane));
+  //}, 95000);
+
+  ////Wave 12
+  //setTimeout(() => {
+  //  for (var i = 0; i < 6; i++)
+  //    enemies.push(new GroundEnemy(scene, -35 + 14 * i, -60, plane));
+  //}, 100000);
+
+  //sideDirection = 1;
+  //setTimeout(() => {
+  //  for (var i = 0; i < 8; i++) {
+  //    enemies.push(new ArcEnemy(scene, 10 + 6 * i, 0.5, sideDirection));
+  //    sideDirection *= -1;
+  //  }
+  //}, 102000);
+
+  //setTimeout(() => {
+  //  for (var i = 0; i < 8; i++)
+  //    enemies.push(new GroundEnemy(scene, -49 + 14 * i, -60, plane));
+  //}, 105000);
+
+  //sideDirection = -1;
+  //setTimeout(() => {
+  //  for (var i = 0; i < 8; i++) {
+  //    enemies.push(new ArcEnemy(scene, 10 + 6 * i, 0.5, sideDirection));
+  //    sideDirection *= -1;
+  //  }
+  //}, 107000);
+
+  //setTimeout(() => {
+  //  for (var i = 0; i < 10; i++)
+  //    enemies.push(new GroundEnemy(scene, -63 + 14 * i, -60, plane));
+  //}, 110000);
+
+  //setTimeout(() => {
+  //  for (var i = 0; i < 8; i++)
+  //    enemies.push(new Enemy(scene, -49 + 14 * i, 0.4, plane));
+  //}, 115000);
+
+  //setTimeout(() => {
+  //  for (var i = 0; i < 8; i++)
+  //    enemies.push(new Enemy(scene, -49 + 14 * i, 0.4, plane));
+  //}, 118000);
+
+  //setTimeout(() => {
+  //  for (var i = 0; i < 8; i++)
+  //    enemies.push(new Enemy(scene, -49 + 14 * i, 0.4, plane));
+  //}, 121000);
+};
 
 const updateEnemies = () => {
   enemies = enemies.filter((enemy) => {
@@ -244,13 +555,29 @@ const update = (timeStep) => {
   updateEnemyShots();
   updateEnemies();
   checkCollision();
+  game(timeStep);
   keyboardHandler(timeStep);
   //moveGround(ground);
   stats.update();
 };
 
-const makeAnimationFrameRequest = () => {
-  animationFrameRequest = requestAnimationFrame((timeStep) => {
+const makeAnimationFrameRequest = (dt) => {
+  animationFrameRequest = requestAnimationFrame((requestDt) => {
+    let timeStep;
+
+    console.log("==============================");
+    if (dt === undefined) {
+      console.log("Receiveng request dt");
+      timeStep = requestDt;
+    } else {
+      console.log("***************");
+      console.log("Receiveng saved DT");
+      timeStep = dt;
+    }
+    console.log(`timeStep: ${timeStep}`);
+
+    savedTimeStep = timeStep;
+
     makeAnimationFrameRequest();
     update(timeStep);
   });
@@ -260,7 +587,7 @@ const isGamePaused = () => animationFrameRequest === undefined;
 
 const togglePause = () => {
   if (isGamePaused()) {
-    makeAnimationFrameRequest();
+    makeAnimationFrameRequest(savedTimeStep);
   } else {
     cancelAnimationFrame(animationFrameRequest);
     animationFrameRequest = undefined;

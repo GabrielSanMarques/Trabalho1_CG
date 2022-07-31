@@ -2,7 +2,7 @@ import * as THREE from "three";
 import { GameObject } from "./GameObject.js";
 
 const ballGeometry = new THREE.SphereGeometry(0.4, 20, 20);
-const ballMaterial = new THREE.MeshLambertMaterial({ color: "light blue" });
+const ballMaterial = new THREE.MeshLambertMaterial({ color: "lightblue" });
 const speed = 1;
 
 export class AirEnemyShot extends GameObject {
@@ -13,7 +13,11 @@ export class AirEnemyShot extends GameObject {
     const y = enemy.positionY();
     const z = enemy.positionZ() + 3;
 
-    this.direction = new THREE.Vector3(x - plane.positionX(), y, z - plane.positionZ());
+    this.direction = new THREE.Vector3(
+      x - plane.positionX(),
+      y,
+      z - plane.positionZ()
+    );
     this.direction.normalize();
 
     this.bb = new THREE.Sphere(this.obj.position, 0.4);
@@ -24,5 +28,4 @@ export class AirEnemyShot extends GameObject {
     this.obj.translateZ(this.direction.z * -speed);
     this.obj.translateX(this.direction.x * -speed);
   }
-
 }

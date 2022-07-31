@@ -2,7 +2,7 @@ import * as THREE from "three";
 import { Water } from "../build/jsm/objects/Water2.js";
 import { GROUND_WIDTH, GROUND_HEIGHT, GROUND_Y } from "./ground.js";
 
-const WATER_COLOR = "#ffffff";
+const WATER_COLOR = "blue";
 const WATER_SCALE = 4;
 const WATER_FLOW_X = 1;
 const WATER_FLOW_Y = 1;

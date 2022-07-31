@@ -15,6 +15,7 @@ import { createGround, moveGround } from "./ground.js";
 import { createDirectionalLight } from "./directionalLight.js";
 import { createHeart } from "./hearts.js";
 import { createWater } from "./water.js";
+import { createValley } from "./valley.js";
 
 import { initCamera, InfoBox } from "../libs/util/util.js";
 import {
@@ -295,6 +296,7 @@ window.addEventListener("keydown", keydownHandler);
 window.addEventListener("keyup", keyupHandler);
 
 createWater(scene);
+createValley(scene);
 createDirectionalLight(scene);
 createCameraHolder(camera, scene);
 createViewportHolder(viewportCam, scene);

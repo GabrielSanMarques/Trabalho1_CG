@@ -46,9 +46,9 @@ const createGround = (scene) => {
 };
 
 const moveGround = (ground) => {
-  var moveDistance = GROUND_SPEED * clock.getDelta();
+  /*var moveDistance = GROUND_SPEED * clock.getDelta();
   ground.translateY(moveDistance);
-  if (ground.position.z >= SCREEN_LIMIT) _setGroundInitialPos(ground);
+  if (ground.position.z >= SCREEN_LIMIT) _setGroundInitialPos(ground);*/
 };
 
 export { GROUND_WIDTH, GROUND_HEIGHT, GROUND_Y, createGround, moveGround };

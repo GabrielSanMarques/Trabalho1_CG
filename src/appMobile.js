@@ -499,15 +499,7 @@ const checkCollision = () => {
   });
 };
 
-const shot = async (timeStep) => {
-  if (canShot || timeStep - lastShotTime > SHOT_CADENCE_DT) {
-    somTiroPrincipal();
-    shots.push(await createShot(plane, scene));
-
-    lastShotTime = timeStep;
-    canShot = false;
-  }
-};
+const shot = async () => shots.push(await createShot(plane, scene));
 
 const bombShot = () => shots.push(new Bomb(plane, scene));
 
@@ -532,7 +524,7 @@ function dualRender() {
   renderer.render(scene, viewportCam);
 }
 
-const update = (timeStep) => {
+const update = () => {
   dualRender();
   updateShots();
   updateEnemyShots();
@@ -686,7 +678,7 @@ function updatePlane() {
 function onButtonDown(event) {
   switch (event.target.id) {
     case "Ctrl":
-      shot(timeStep);
+      shot();
       somTiroPrincipal();
       break;
     case "Space":

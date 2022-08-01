@@ -1,46 +1,60 @@
-///////////////
-/// Imports ///
-///////////////
 import * as THREE from "three";
+
 import { createAirplane } from "./airplane.js";
 import { createShot, loadShotImage } from "./shot.js";
+import { StopWatch } from "./StopWatch.js";
 import { Bomb } from "./Bomb.js";
 import { Enemy } from "./Enemy.js";
 import { SideEnemy } from "./SideEnemy.js";
 import { ArcEnemy } from "./ArcEnemy.js";
+import { AirEnemyShot } from "./AirEnemyShot.js";
+import { GroundEnemy } from "./GroundEnemy.js";
+import { GroundEnemyShot } from "./GroundEnemyShot.js";
+
+import { createFpsStatsPanel } from "./stats.js";
 import { createRenderer } from "./renderer.js";
 import { createCameraHolder, createViewportHolder } from "./cameraHolder.js";
-import { createGround, moveGround } from "./ground.js";
 import { createDirectionalLight } from "./directionalLight.js";
 import { createHeart } from "./hearts.js";
+import { createWater } from "./water.js";
+import { createValley } from "./valley.js";
+
 import { initCamera } from "../libs/util/util.js";
 import {
-  somRestart,
-  somColisao,
   somTrilhaSonora,
+  somColisao,
   somTiroPrincipal,
+  somRestart,
+  somTiroAdversario,
 } from "./sound.js";
-import { Buttons } from "../libs/other/buttons.js";
 import { ColladaLoader } from "../build/jsm/loaders/ColladaLoader.js";
 
-///////////////////////////
-/// Variaveis e Funções ///
-///////////////////////////
+import { Buttons } from "../libs/other/buttons.js";
+
 var buttons = new Buttons(onButtonDown);
+////////////////////
+//// Constantes ////
+////////////////////
+
+const SHOT_CADENCE_DT = 500;
+
+///////////////////
+//// Variáveis ////
+///////////////////
+
 const clock = new THREE.Clock();
 var scene = new THREE.Scene();
 const renderer = createRenderer();
+
 const camera = initCamera(new THREE.Vector3(0, 0, 0));
 const viewportCam = new THREE.PerspectiveCamera(50, 48 / 7.8, 1, 500);
-const plane = await createAirplane(scene);
-const ground = createGround(scene);
-const hearts = createHeart(scene);
+const stats = createFpsStatsPanel();
 
-createDirectionalLight(scene);
-createCameraHolder(camera, scene);
-createCameraHolder(camera, scene);
-createViewportHolder(viewportCam, scene);
-somTrilhaSonora();
+const stopWatch = new StopWatch();
+
+const plane = await createAirplane(scene);
+
+const hearts = createHeart(scene);
 
 let enemies = [];
 let shots = [];
@@ -48,7 +62,341 @@ let enemyShots = [];
 
 let collisionEnabled = true;
 
-await loadShotImage();
+let animationFrameRequest = undefined;
+let savedTimeStep = 0;
+
+let canShot = true;
+let lastShotTime = -SHOT_CADENCE_DT;
+
+let sideDirection;
+
+/////////////////
+//// Funções ////
+/////////////////
+
+const prepareGameplay = () => {
+  stopWatch.addTimeEventListerners([
+    {
+      elapsedTime: 1,
+      callback: () => {
+        sideDirection = 1;
+        for (var i = 0; i < 5; i++) {
+          enemies.push(new Enemy(scene, -30 + 15 * i, 0.4, plane));
+        }
+      },
+    },
+    {
+      elapsedTime: 6,
+      callback: () => {
+        for (var i = 0; i < 6; i++) {
+          enemies.push(new SideEnemy(scene, -25 + 10 * i, 0.7, sideDirection));
+          sideDirection *= -1;
+        }
+      },
+    },
+    {
+      elapsedTime: 11,
+      callback: () => {
+        for (var i = 0; i < 6; i++) {
+          sideDirection = 1;
+          enemies.push(new ArcEnemy(scene, 10 + 8 * i, 0.5, sideDirection));
+          sideDirection *= -1;
+        }
+      },
+    },
+    {
+      elapsedTime: 16,
+      callback: () => {
+        for (var i = 0; i < 6; i++)
+          enemies.push(new GroundEnemy(scene, -40 + 16 * i, -60, plane));
+      },
+    },
+    {
+      elapsedTime: 21,
+      callback: () => {
+        for (var i = 0; i < 5; i++) {
+          enemies.push(new Enemy(scene, -30 + 15 * i, 0.4, plane));
+        }
+      },
+    },
+    {
+      elapsedTime: 23,
+      callback: () => {
+        for (var i = 0; i < 5; i++) {
+          enemies.push(new Enemy(scene, -30 + 15 * i, 0.4, plane));
+        }
+      },
+    },
+    {
+      elapsedTime: 24,
+      callback: () => {
+        for (var i = 0; i < 5; i++) {
+          enemies.push(new Enemy(scene, -30 + 15 * i, 0.4, plane));
+        }
+      },
+    },
+    {
+      elapsedTime: 30,
+      callback: () => {
+        sideDirection = 1;
+        for (var i = 0; i < 6; i++) {
+          enemies.push(new ArcEnemy(scene, 10 + 8 * i, 0.5, sideDirection));
+          sideDirection *= -1;
+        }
+      },
+    },
+    {
+      elapsedTime: 32,
+      callback: () => {
+        sideDirection = 1;
+        for (var i = 0; i < 6; i++) {
+          enemies.push(new SideEnemy(scene, -25 + 10 * i, 0.7, sideDirection));
+          sideDirection *= -1;
+        }
+      },
+    },
+    {
+      elapsedTime: 37,
+      callback: () => {
+        for (var i = 0; i < 6; i++) {
+          enemies.push(new Enemy(scene, -40 + 16 * i, 0.4, plane));
+        }
+        for (var i = 0; i < 6; i++) {
+          enemies.push(new GroundEnemy(scene, -40 + 16 * i, -60, plane));
+        }
+      },
+    },
+    {
+      elapsedTime: 39,
+      callback: () => {
+        sideDirection = 1;
+        for (var i = 0; i < 6; i++) {
+          enemies.push(new SideEnemy(scene, -25 + 10 * i, 0.7, sideDirection));
+          sideDirection *= -1;
+        }
+      },
+    },
+    {
+      elapsedTime: 44,
+      callback: () => {
+        for (var i = 0; i < 8; i++) {
+          enemies.push(new GroundEnemy(scene, -49 + 14 * i, -60, plane));
+        }
+
+        sideDirection = 1;
+        for (var i = 0; i < 6; i++) {
+          enemies.push(new SideEnemy(scene, -25 + 10 * i, 0.7, sideDirection));
+          sideDirection *= -1;
+        }
+      },
+    },
+    {
+      elapsedTime: 46,
+      callback: () => {
+        for (var i = 0; i < 8; i++) {
+          enemies.push(new Enemy(scene, -49 + 14 * i, 0.4, plane));
+        }
+      },
+    },
+    {
+      elapsedTime: 51,
+      callback: () => {
+        for (var i = 0; i < 6; i++)
+          enemies.push(new GroundEnemy(scene, -35 + 14 * i, -60, plane));
+      },
+    },
+    {
+      elapsedTime: 53,
+      callback: () => {
+        for (var i = 0; i < 8; i++)
+          enemies.push(new GroundEnemy(scene, -49 + 14 * i, -60, plane));
+      },
+    },
+    {
+      elapsedTime: 55,
+      callback: () => {
+        sideDirection = 1;
+        for (let i = 0; i < 10; i++)
+          enemies.push(new GroundEnemy(scene, -63 + 14 * i, -60, plane));
+        for (let i = 0; i < 6; i++) {
+          enemies.push(new SideEnemy(scene, -25 + 10 * i, 0.7, sideDirection));
+          sideDirection *= -1;
+        }
+      },
+    },
+    {
+      elapsedTime: 60,
+      callback: () => {
+        for (var i = 0; i < 8; i++)
+          enemies.push(new Enemy(scene, -49 + 14 * i, 0.4, plane));
+      },
+    },
+    {
+      elapsedTime: 62,
+      callback: () => {
+        for (var i = 0; i < 8; i++) {
+          enemies.push(new Enemy(scene, -49 + 14 * i, 0.4, plane));
+        }
+        sideDirection = 1;
+        for (var i = 0; i < 6; i++) {
+          enemies.push(new ArcEnemy(scene, 10 + 8 * i, 0.5, sideDirection));
+          sideDirection *= -1;
+        }
+      },
+    },
+    {
+      elapsedTime: 64,
+      callback: () => {
+        sideDirection = 1;
+        for (var i = 0; i < 8; i++)
+          enemies.push(new Enemy(scene, -49 + 14 * i, 0.4, plane));
+      },
+    },
+    {
+      elapsedTime: 69,
+      callback: () => {
+        sideDirection = 1;
+        for (var i = 0; i < 8; i++) {
+          enemies.push(new ArcEnemy(scene, 10 + 6 * i, 0.5, sideDirection));
+          sideDirection *= -1;
+        }
+      },
+    },
+    {
+      elapsedTime: 72,
+      callback: () => {
+        sideDirection = -1;
+        for (var i = 0; i < 8; i++) {
+          enemies.push(new ArcEnemy(scene, 5 + 6 * i, 0.5, sideDirection));
+          sideDirection *= -1;
+        }
+      },
+    },
+    {
+      elapsedTime: 75,
+      callback: () => {
+        sideDirection = 1;
+        for (var i = 0; i < 8; i++) {
+          enemies.push(new ArcEnemy(scene, 10 + 6 * i, 0.5, sideDirection));
+          sideDirection *= -1;
+        }
+      },
+    },
+    {
+      elapsedTime: 80,
+      callback: () => {
+        for (var i = 0; i < 6; i++)
+          enemies.push(new GroundEnemy(scene, -35 + 14 * i, -60, plane));
+      },
+    },
+    {
+      elapsedTime: 83,
+      callback: () => {
+        for (var i = 0; i < 8; i++)
+          enemies.push(new GroundEnemy(scene, -49 + 14 * i, -60, plane));
+      },
+    },
+    {
+      elapsedTime: 86,
+      callback: () => {
+        for (var i = 0; i < 10; i++)
+          enemies.push(new GroundEnemy(scene, -63 + 14 * i, -60, plane));
+      },
+    },
+    {
+      elapsedTime: 89,
+      callback: () => {
+        for (var i = 0; i < 10; i++)
+          enemies.push(new GroundEnemy(scene, -63 + 14 * i, -60, plane));
+      },
+    },
+    {
+      elapsedTime: 92,
+      callback: () => {
+        for (var i = 0; i < 8; i++)
+          enemies.push(new GroundEnemy(scene, -49 + 14 * i, -60, plane));
+      },
+    },
+    {
+      elapsedTime: 95,
+      callback: () => {
+        for (var i = 0; i < 6; i++)
+          enemies.push(new GroundEnemy(scene, -35 + 14 * i, -60, plane));
+      },
+    },
+    {
+      elapsedTime: 100,
+      callback: () => {
+        for (var i = 0; i < 6; i++)
+          enemies.push(new GroundEnemy(scene, -35 + 14 * i, -60, plane));
+      },
+    },
+    {
+      elapsedTime: 102,
+      callback: () => {
+        sideDirection = 1;
+        for (var i = 0; i < 8; i++) {
+          enemies.push(new ArcEnemy(scene, 10 + 6 * i, 0.5, sideDirection));
+          sideDirection *= -1;
+        }
+      },
+    },
+    {
+      elapsedTime: 105,
+      callback: () => {
+        for (var i = 0; i < 8; i++)
+          enemies.push(new GroundEnemy(scene, -49 + 14 * i, -60, plane));
+      },
+    },
+    {
+      elapsedTime: 107,
+      callback: () => {
+        sideDirection = -1;
+        for (var i = 0; i < 8; i++) {
+          enemies.push(new ArcEnemy(scene, 10 + 6 * i, 0.5, sideDirection));
+          sideDirection *= -1;
+        }
+      },
+    },
+    {
+      elapsedTime: 110,
+      callback: () => {
+        for (var i = 0; i < 10; i++)
+          enemies.push(new GroundEnemy(scene, -63 + 14 * i, -60, plane));
+      },
+    },
+    {
+      elapsedTime: 115,
+      callback: () => {
+        for (var i = 0; i < 8; i++)
+          enemies.push(new Enemy(scene, -49 + 14 * i, 0.4, plane));
+      },
+    },
+    {
+      elapsedTime: 118,
+      callback: () => {
+        for (var i = 0; i < 8; i++)
+          enemies.push(new Enemy(scene, -49 + 14 * i, 0.4, plane));
+      },
+    },
+    {
+      elapsedTime: 121,
+      callback: () => {
+        for (var i = 0; i < 8; i++)
+          enemies.push(new Enemy(scene, -49 + 14 * i, 0.4, plane));
+      },
+    },
+  ]);
+};
+
+const enemyShot = () => {
+  enemies.forEach((enemy) => {
+    if (enemy instanceof GroundEnemy)
+      enemyShots.push(new GroundEnemyShot(enemy, scene, plane));
+    else enemyShots.push(new AirEnemyShot(enemy, scene, plane));
+  });
+  somTiroAdversario();
+};
 
 const updateEnemies = () => {
   enemies = enemies.filter((enemy) => {
@@ -144,6 +492,7 @@ const checkCollision = () => {
     if (shot.collidesWith(plane)) {
       shot.removeFromScene();
       decreseLife(1);
+      somColisao();
       keep = false;
     }
     return keep;
@@ -154,14 +503,74 @@ const shot = async () => shots.push(await createShot(plane, scene));
 
 const bombShot = () => shots.push(new Bomb(plane, scene));
 
-let animationFrameRequest = undefined;
+function dualRender() {
+  var width = window.innerWidth;
+  var height = window.innerHeight;
+
+  // Set main camera
+  renderer.setViewport(0, 0, width, height);
+  renderer.setScissorTest(false);
+  renderer.setClearColor("rgb(0,70,170)");
+  renderer.clear();
+  renderer.render(scene, camera);
+
+  // Set virtual camera viewport
+  renderer.setViewport(0, 0, width * 0.4, height * 0.1);
+  renderer.setScissor(0, 0, width * 0.4, height * 0.1);
+  renderer.setScissorTest(true);
+
+  renderer.setClearColor(0x00ff00, 0);
+  if (renderer.autoclear) renderer.clear();
+  renderer.render(scene, viewportCam);
+}
+
+const update = () => {
+  dualRender();
+  updateShots();
+  updateEnemyShots();
+  updateEnemies();
+  checkCollision();
+  stats.update();
+  updatePlane();
+};
 
 const makeAnimationFrameRequest = () => {
-  animationFrameRequest = requestAnimationFrame(() => {
+  animationFrameRequest = requestAnimationFrame((dt) => {
     makeAnimationFrameRequest();
-    update();
+    update(dt);
   });
 };
+
+const loadAssetsAndStart = async () => {
+  await loadShotImage();
+
+  prepareGameplay();
+
+  stopWatch.start();
+
+  somTrilhaSonora();
+  makeAnimationFrameRequest();
+};
+
+const keyupHandler = (e) => {
+  if (e.key == "Control") {
+    canShot = true;
+  }
+};
+
+///////////////////////
+//// Inicialização ////
+///////////////////////
+
+window.addEventListener("keyup", keyupHandler);
+
+createWater(scene);
+createValley(scene);
+createDirectionalLight(scene);
+createCameraHolder(camera, scene);
+createViewportHolder(viewportCam, scene);
+
+stopWatch.executeOnInterval(enemyShot, 3000);
 
 /////////////////////////////////////
 /// Loading Screen e Stormtrooper ///
@@ -200,10 +609,20 @@ function onButtonPressed() {
   loadingScreen.addEventListener("transitionend", (e) => {
     const element = e.target;
     element.remove();
+    loadAssetsAndStart();
   });
 }
 
-////////////////////////////
+const restartGame = (timeout) => {
+  scene = scene2;
+  somRestart();
+  setTimeout(() => window.location.reload(), timeout ?? 4000);
+};
+
+var scene2 = new THREE.Scene();
+scene2.background = new THREE.Color("rgb(60, 60, 80)");
+
+///////////////////////////
 /// Joysticks e Buttons ///
 ///////////////////////////
 
@@ -234,6 +653,11 @@ function addJoysticks() {
   });
 }
 
+const screenUpperLimitZ = -35;
+const screenLowerLimitZ = 35;
+const screenLeftLimitX = -35;
+const screeRightLimitX = 35;
+
 function updatePlane() {
   const dt = clock.getDelta();
   if (fwdValue && plane.positionZ() >= screenUpperLimitZ) {
@@ -263,56 +687,3 @@ function onButtonDown(event) {
       break;
   }
 }
-
-//////////////////
-/// Reset Game ///
-//////////////////
-
-const restartGame = (timeout) => {
-  scene = scene2;
-  somRestart();
-  setTimeout(() => window.location.reload(), timeout ?? 4000);
-};
-
-var scene2 = new THREE.Scene();
-scene2.background = new THREE.Color("rgb(60, 60, 80)");
-
-///////////////////////
-/// Render e Update ///
-///////////////////////
-
-const screenUpperLimitZ = -35;
-const screenLowerLimitZ = 35;
-const screenLeftLimitX = -35;
-const screeRightLimitX = 35;
-
-function dualRender() {
-  var width = window.innerWidth;
-  var height = window.innerHeight;
-
-  //Set main camera
-  renderer.setViewport(0, 0, width, height); // Reset viewport
-  renderer.setScissorTest(false); // Disable scissor to paint the entire window
-  renderer.setClearColor("rgb(60, 60, 80)");
-  renderer.clear(); // Clean the window
-  renderer.render(scene, camera);
-
-  // // Set virtual camera viewport
-  renderer.setViewport(0, 0, width * 0.4, height * 0.1); // Set virtual camera viewport
-  renderer.setScissor(0, 0, width * 0.4, height * 0.1); // Set scissor with the same size as the viewport
-  renderer.setScissorTest(true); // Enable scissor to paint only the scissor are (i.e., the small viewport)
-  renderer.setClearColor(0x00ff00, 0); // border color
-  if (renderer.autoclear) renderer.clear(); //Set Transparency
-  renderer.render(scene, viewportCam); // Render scene of the virtual camera
-}
-
-const update = () => {
-  dualRender();
-  updateShots();
-  updateEnemyShots();
-  updateEnemies();
-  checkCollision();
-  moveGround(ground);
-  updatePlane();
-};
-makeAnimationFrameRequest();

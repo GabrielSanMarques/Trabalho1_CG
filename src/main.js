@@ -10,7 +10,7 @@ import { SideEnemy } from "./SideEnemy.js";
 import { ArcEnemy } from "./ArcEnemy.js";
 import { AirEnemyShot } from "./AirEnemyShot.js";
 import { GroundEnemy } from "./GroundEnemy.js";
-import { GroundEnemyShot } from "./GroundEnemyShot.js";
+import { createGroundEnemyShot } from "./GroundEnemyShot.js";
 
 import { createFpsStatsPanel } from "./stats.js";
 import { createRenderer } from "./renderer.js";
@@ -394,10 +394,10 @@ const prepareGameplay = () => {
   ]);
 };
 
-const enemyShot = () => {
-  enemies.forEach((enemy) => {
+const enemyShot = async() => {
+  enemies.forEach(async(enemy) => {
     if (enemy instanceof GroundEnemy)
-      enemyShots.push(new GroundEnemyShot(enemy, scene, plane));
+      enemyShots.push(await createGroundEnemyShot(enemy, scene, plane));
     else enemyShots.push(new AirEnemyShot(enemy, scene, plane));
   });
   somTiroAdversario();
@@ -452,7 +452,7 @@ const updateShots = () => {
   });
 };
 
-const decreseLife = (pts) => {
+const decreaseLife = (pts) => {
   if (collisionEnabled) {
     if (plane.life > 0) {
       plane.life -= pts;
@@ -474,7 +474,7 @@ const checkCollision = () => {
     let keep = true;
 
     if (enemy.collidesWith(plane)) {
-      decreseLife(2);
+      decreaseLife(2);
       enemy.fadoutFromScene();
       keep = false;
       somColisao();
@@ -496,7 +496,7 @@ const checkCollision = () => {
     let keep = true;
     if (shot.collidesWith(plane)) {
       shot.removeFromScene();
-      decreseLife(1);
+      decreaseLife(1);
       somColisao();
       keep = false;
     }

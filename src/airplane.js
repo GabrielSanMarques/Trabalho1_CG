@@ -53,8 +53,8 @@ export const createAirplane = async (scene) => {
     },
     equilibrio: (dt) => {
       if (obj.rotation.y > -1.45) {
-        if (direcao) obj.rotateX(-1.5 * dt);
-        else obj.rotateX(1.5 * dt);
+        if (direcao) obj.rotateX(-0.045);
+        else obj.rotateX(0.045);
       } else obj.rotation.y = -1.55;
       //console.log(obj.rotation.y);
     },

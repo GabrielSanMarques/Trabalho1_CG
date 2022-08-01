@@ -9,7 +9,7 @@ import { SideEnemy } from "./SideEnemy.js";
 import { ArcEnemy } from "./ArcEnemy.js";
 import { AirEnemyShot } from "./AirEnemyShot.js";
 import { GroundEnemy } from "./GroundEnemy.js";
-import { GroundEnemyShot } from "./GroundEnemyShot.js";
+import { createGroundEnemyShot } from "./GroundEnemyShot.js";
 
 import { createFpsStatsPanel } from "./stats.js";
 import { createRenderer } from "./renderer.js";
@@ -31,17 +31,10 @@ import { ColladaLoader } from "../build/jsm/loaders/ColladaLoader.js";
 
 import { Buttons } from "../libs/other/buttons.js";
 
-var buttons = new Buttons(onButtonDown);
-////////////////////
-//// Constantes ////
-////////////////////
-
-const SHOT_CADENCE_DT = 500;
-
 ///////////////////
 //// Variáveis ////
 ///////////////////
-
+var buttons = new Buttons(onButtonDown);
 const clock = new THREE.Clock();
 var scene = new THREE.Scene();
 const renderer = createRenderer();
@@ -63,10 +56,6 @@ let enemyShots = [];
 let collisionEnabled = true;
 
 let animationFrameRequest = undefined;
-let savedTimeStep = 0;
-
-let canShot = true;
-let lastShotTime = -SHOT_CADENCE_DT;
 
 let sideDirection;
 
@@ -389,10 +378,10 @@ const prepareGameplay = () => {
   ]);
 };
 
-const enemyShot = () => {
-  enemies.forEach((enemy) => {
+const enemyShot = async () => {
+  enemies.forEach(async (enemy) => {
     if (enemy instanceof GroundEnemy)
-      enemyShots.push(new GroundEnemyShot(enemy, scene, plane));
+      enemyShots.push(await createGroundEnemyShot(enemy, scene, plane));
     else enemyShots.push(new AirEnemyShot(enemy, scene, plane));
   });
   somTiroAdversario();
@@ -447,7 +436,7 @@ const updateShots = () => {
   });
 };
 
-const decreseLife = (pts) => {
+const decreaseLife = (pts) => {
   if (collisionEnabled) {
     if (plane.life > 0) {
       plane.life -= pts;
@@ -469,7 +458,7 @@ const checkCollision = () => {
     let keep = true;
 
     if (enemy.collidesWith(plane)) {
-      decreseLife(2);
+      decreaseLife(2);
       enemy.fadoutFromScene();
       keep = false;
       somColisao();
@@ -491,7 +480,7 @@ const checkCollision = () => {
     let keep = true;
     if (shot.collidesWith(plane)) {
       shot.removeFromScene();
-      decreseLife(1);
+      decreaseLife(1);
       somColisao();
       keep = false;
     }
@@ -499,7 +488,10 @@ const checkCollision = () => {
   });
 };
 
-const shot = async () => shots.push(await createShot(plane, scene));
+const shot = async () => {
+  somTiroPrincipal();
+  shots.push(await createShot(plane, scene));
+};
 
 const bombShot = () => shots.push(new Bomb(plane, scene));
 
@@ -524,12 +516,13 @@ function dualRender() {
   renderer.render(scene, viewportCam);
 }
 
-const update = () => {
+const update = (timeStep) => {
   dualRender();
   updateShots();
   updateEnemyShots();
   updateEnemies();
   checkCollision();
+  //moveGround(ground);
   stats.update();
   updatePlane();
 };
@@ -552,17 +545,9 @@ const loadAssetsAndStart = async () => {
   makeAnimationFrameRequest();
 };
 
-const keyupHandler = (e) => {
-  if (e.key == "Control") {
-    canShot = true;
-  }
-};
-
 ///////////////////////
 //// Inicialização ////
 ///////////////////////
-
-window.addEventListener("keyup", keyupHandler);
 
 createWater(scene);
 createValley(scene);
